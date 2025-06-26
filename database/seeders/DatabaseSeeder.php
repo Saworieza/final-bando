@@ -16,5 +16,14 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminUserSeeder::class,
         ]);
+
+        //  // Assume this user exists and is a Seller
+        // $seller = AdminUserSeeder::where('email', 'seller@bando.test')->first();
+
+        // if ($seller) {
+        //     Product::factory()->count(5)->create([
+        //         'user_id' => $seller->id,
+        //     ]);
+        // }
     }
 }

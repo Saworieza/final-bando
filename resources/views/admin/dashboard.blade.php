@@ -94,7 +94,7 @@
             <div class="mb-4 flex space-x-4">
                 @foreach ($tabs as $tab)
                     <a href="{{ route('dashboard', ['tab' => $tab]) }}"
-                        class="px-4 py-2 rounded-t {{ $selectedTab === $tab ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                        class="px-4 py-2 rounded-t {{ $selectedTab === $tab ? 'bg-blue-600 text-black' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
                         {{ $tab }}s
                     </a>
                 @endforeach
