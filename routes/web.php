@@ -43,3 +43,5 @@ Route::view('/pending-approval', 'auth.pending-approval')->name('pending.approva
 
 // Breeze auth routes (login, register, etc.)
 require __DIR__.'/auth.php';
+
+

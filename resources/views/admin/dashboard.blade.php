@@ -21,7 +21,7 @@
             @endphp
 
             <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 mb-6">
-                <p class="font-semibold">{{ $pendingUsers->count() }} user(s) awaiting approval</p>
+                <p class="font-semibold">You have {{ $pendingUsers->count() }} Sellers(s) Awaiting Your approval</p>
             </div>
 
             <div class="overflow-x-auto bg-white shadow rounded mb-10">
@@ -31,7 +31,6 @@
                             <th class="px-4 py-2 font-semibold">Name</th>
                             <th class="px-4 py-2 font-semibold">Email</th>
                             <th class="px-4 py-2 font-semibold">Status</th>
-                            <th class="px-4 py-2 font-semibold">Change Role</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,7 +44,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="new_role" value="{{ $user->hasRole('Pending Seller') ? 'Seller' : 'Support Agent' }}">
-                                        <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
+                                        <button type="submit" class="px-3 py-1 bg-blue-600 text-black rounded hover:bg-blue-700">
                                             Approve
                                         </button>
                                     </form>
@@ -60,21 +59,7 @@
                                         </button>
                                     </form>
                                 </td>
-                                <td class="px-4 py-2">
-                                    <form method="POST" action="{{ route('admin.approve', $user->id) }}" class="flex space-x-2 items-center">
-                                        @csrf
-                                        @method('PATCH')
-                                        <select name="new_role" class="border p-1 rounded">
-                                            <option value="Seller">Seller</option>
-                                            <option value="Support Agent">Support Agent</option>
-                                            <option value="Buyer">Buyer</option>
-                                            <option value="Admin">Admin</option>
-                                        </select>
-                                        <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                                            Change
-                                        </button>
-                                    </form>
-                                </td>
+                                
                             </tr>
                         @empty
                             <tr>
@@ -111,6 +96,7 @@
                             <th class="px-4 py-2 font-semibold">Name</th>
                             <th class="px-4 py-2 font-semibold">Email</th>
                             <th class="px-4 py-2 font-semibold">Role</th>
+                            <th class="px-4 py-2 font-semibold">Change Role</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,6 +105,21 @@
                                 <td class="px-4 py-2">{{ $user->name }}</td>
                                 <td class="px-4 py-2">{{ $user->email }}</td>
                                 <td class="px-4 py-2">{{ $user->getRoleNames()->first() }}</td>
+                                <td class="px-4 py-2">
+                                    <form method="POST" action="{{ route('admin.approve', $user->id) }}" class="flex space-x-2 items-center">
+                                        @csrf
+                                        @method('PATCH')
+                                        <select name="new_role" class="border p-1 rounded">
+                                            <option value="Seller">Seller</option>
+                                            <option value="Support Agent">Support Agent</option>
+                                            <option value="Buyer">Buyer</option>
+                                            <option value="Admin">Admin</option>
+                                        </select>
+                                        <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                            Change
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
                         @empty
                             <tr>
