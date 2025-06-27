@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\AdminUserApprovalController;
-use App\Http\Controllers\Seller\ProductController;
+use App\Http\Controllers\StoreProductController;
 
 // Public homepage
 Route::get('/', function () {
@@ -27,18 +27,41 @@ Route::middleware('auth')->group(function () {
     Route::patch('/admin/approve-user/{user}', [AdminUserApprovalController::class, 'update'])
         ->name('admin.approve');
     
-    // Only for sellers
-    Route::middleware('role:Seller')->prefix('seller')->group(function () {
-        Route::resource('products', ProductController::class);
-    });
-
-    Route::middleware('role:Seller')->get('/test-role', function () {
-        return 'Seller middleware is working!';
-    });
+    
+    // AUTH CRUD
+    // Authenticated (Seller/Admin only)
+    Route::get('/dashboard/products', [StoreProductController::class, 'myProducts'])->name('products.my');
+    Route::resource('products', StoreProductController::class)->except(['index', 'show']);
+    // Manual CRUD routes (excluding index/show which are public)
+    
 });
+
+// PUBLIC viewable
+    Route::get('/products', [StoreProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{product}', [StoreProductController::class, 'show'])->name('products.show');
+
 
 //Pending Approval
 Route::view('/pending-approval', 'auth.pending-approval')->name('pending.approval');
+
+Route::get('/search', function () {
+    // implement search logic
+})->name('search');
+
+Route::get('/cart', function () {
+    return 'Cart will go here';
+})->name('cart.index');
+
+Route::get('/distributors', function () {
+    return view('pages.distributors'); // or whatever view you want
+})->name('distributors');
+
+Route::get('/lang/{locale}', function ($locale) {
+    session(['locale' => $locale]);
+    app()->setLocale($locale);
+    return back();
+})->name('lang.switch');
+
 
 
 // Breeze auth routes (login, register, etc.)

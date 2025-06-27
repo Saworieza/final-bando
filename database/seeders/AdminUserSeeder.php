@@ -28,13 +28,13 @@ class AdminUserSeeder extends Seeder
         $seller->assignRole('Seller');
 
         // Assume this user exists and is a Seller
-        $seller = User::where('email', 'seller@bando.test')->first();
+        // $seller = User::where('email', 'seller@bando.test')->first();
 
-        if ($seller) {
-            Product::factory()->count(5)->create([
-                'user_id' => $seller->id,
-            ]);
-        }
+        // if ($seller) {
+        //     Product::factory()->count(5)->create([
+        //         'user_id' => $seller->id,
+        //     ]);
+        // }
 
         $buyer = User::create([
             'name' => 'Buyer',

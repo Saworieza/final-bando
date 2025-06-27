@@ -3,19 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-// use HasFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory; // ✅ Correct
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Category;
+use App\Models\User;
 
 class Product extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'user_id', 'name', 'description', 'sku', 'category', 'tags',
-        'price', 'min_order_qty', 'status',
+        'name',
+        'description',
+        'price',
+        'image',
+        'category_id',
+        'user_id',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 }
-

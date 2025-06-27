@@ -18,6 +18,64 @@
                 </div>
             </div>
 
+            <div class="hidden md:flex space-x-6 text-sm text-gray-700 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+
+            <!-- Products Dropdown -->
+            <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <x-dropdown align="left" width="48">
+                    <x-slot name="trigger">
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            <div>Products</div>
+                            <div class="ms-1">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </button>
+                    </x-slot>
+
+                    <x-slot name="content">
+                        @foreach(App\Models\Category::all() as $category)
+                            <x-dropdown-link :href="route('products.index', ['category' => $category->slug])">
+                                {{ $category->name }}
+                            </x-dropdown-link>
+                        @endforeach
+                    </x-slot>
+                </x-dropdown>
+            </div>
+
+
+            <!-- Distributor Locator -->
+            <a href="{{ route('distributors') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-blue-600 focus:outline-none transition ease-in-out duration-150">
+                Distributor Locator
+            </a>
+
+            <!-- Knowledge Center (Blog) Dropdown -->
+            <div class="relative group">
+                <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-blue-600 focus:outline-none transition ease-in-out duration-150">
+                    Knowledge Center
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div class="absolute hidden group-hover:block mt-2 bg-white border rounded shadow-md z-50 w-56">
+                    @foreach(App\Models\KnowledgeCategory::all() as $knowledge)
+                        <a href="{{ route('blog.category', ['slug' => $knowledge->slug]) }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            {{ $knowledge->name }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Search -->
+            <form action="{{ route('search') }}" method="GET" class="relative">
+                <input type="text" name="query" placeholder="Search…" class="rounded-md border border-gray-300 px-3 py-1 text-sm focus:ring-blue-500 focus:border-blue-500">
+            </form>
+        </div>
+
+
+
             <!-- Settings Dropdown -->
              @auth
             <div class="hidden sm:flex sm:items-center sm:ms-6">

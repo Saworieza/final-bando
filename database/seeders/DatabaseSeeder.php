@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Category;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,13 +18,13 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
         ]);
 
-        //  // Assume this user exists and is a Seller
-        // $seller = AdminUserSeeder::where('email', 'seller@bando.test')->first();
+        Category::insert([
+            ['name' => 'Automotive', 'slug' => 'automotive'],
+            ['name' => 'Industrial', 'slug' => 'industrail'],
+            ['name' => 'Agricultural', 'slug' => 'agricultural'],
+            ['name' => 'Conveyor', 'slug' => 'conveyor-belts'],
+            ['name' => 'Belt Tools', 'slug' => 'tools'],
+        ]);
 
-        // if ($seller) {
-        //     Product::factory()->count(5)->create([
-        //         'user_id' => $seller->id,
-        //     ]);
-        // }
     }
 }
