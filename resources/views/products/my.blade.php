@@ -16,7 +16,7 @@
         <div class="grid md:grid-cols-2 gap-6">
             @forelse ($products as $product)
                 <div class="bg-white border p-4 rounded shadow-sm">
-                    <h3 class="text-lg font-bold">{{ $product->name }}</h3>
+                    <h3 class="text-lg font-bold"><a href="{{ route('products.show', $product) }}">{{ $product->name }}</a></h3>
                     <p class="text-gray-600">Ksh {{ number_format($product->price, 2) }}</p>
                     <div class="flex space-x-2 mt-3">
                         <a href="{{ route('products.edit', $product) }}" class="text-blue-600 text-sm">Edit</a>

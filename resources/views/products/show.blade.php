@@ -1,9 +1,14 @@
 <x-app-layout>
+
     <x-slot name="header">
+<p class="text-sm text-gray-600 mb-2">
+    {{ $product->category->name ?? 'Uncategorized' }}
+</p>
+
         <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            {{ $product->name }}
+            <p><x-breadcrumb :links="[$product->category->name ?? 'Uncategorized' => route('products.index', ['category' => $product->category->slug ?? null]), $product->name => null]" /></p>
         </h2>
-    </x-slot>
+        </x-slot>
 
     <div class="py-6 max-w-5xl mx-auto space-y-6">
         <div class="bg-white p-6 rounded shadow">

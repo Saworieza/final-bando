@@ -1,7 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold text-gray-800">All Products</h2>
+        <x-breadcrumb :links="[
+            $currentCategory?->name ?? 'All Products' => null
+        ]" />
     </x-slot>
+
+    
+
 
     <div class="py-6 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
         @forelse ($products as $product)

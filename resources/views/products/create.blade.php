@@ -32,10 +32,10 @@
                 <textarea name="description" class="w-full border rounded px-3 py-2">{{ old('description') }}</textarea>
             </div>
 
-            <!-- <div>
-                <label class="block font-medium">Image</label>
+            <div>
+                <label class="block font-medium">Main Image</label>
                 <input type="file" name="image" class="w-full">
-            </div> -->
+            </div>
 
             <div class="mb-4">
                 <label for="images" class="block font-medium text-sm text-gray-700">Product Images</label>

@@ -25,7 +25,12 @@ class StoreProductController extends Controller
 
         $products = $query->get();
 
-        return view('products.index', compact('products'));
+        $currentCategory = $request->has('category') ? Category::where('slug', $request->category)->first() : null;
+
+        // return view('products.index', compact('products'));
+        return view('products.index', compact('products', 'currentCategory'));
+
+        
     }
 
     // Public product details
