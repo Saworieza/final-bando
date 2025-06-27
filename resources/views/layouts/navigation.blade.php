@@ -36,9 +36,10 @@
 
                     <x-slot name="content">
                         @foreach(App\Models\Category::all() as $category)
-                            <x-dropdown-link :href="route('products.index', ['category' => $category->slug])">
+                            <a href="{{ route('products.index', ['category' => $category->slug]) }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 {{ $category->name }}
-                            </x-dropdown-link>
+                            </a>
                         @endforeach
                     </x-slot>
                 </x-dropdown>

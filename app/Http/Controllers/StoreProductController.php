@@ -11,9 +11,23 @@ use Illuminate\Support\Facades\Storage;
 class StoreProductController extends Controller
 {
     // Public product list
-    public function index()
+    // public function index()
+    // {
+    //     $products = Product::with('category', 'user')->latest()->get();
+    //     return view('products.index', compact('products'));
+    // }
+    public function index(Request $request)
     {
-        $products = Product::with('category', 'user')->latest()->get();
+        $query = Product::with('category', 'user')->latest();
+
+        // Filter by category slug if passed
+        if ($request->has('category')) {
+            $category = Category::where('slug', $request->category)->firstOrFail();
+            $query->where('category_id', $category->id);
+        }
+
+        $products = $query->get();
+
         return view('products.index', compact('products'));
     }
 
