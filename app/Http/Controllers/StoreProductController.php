@@ -7,15 +7,12 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ProductImage;
 
 class StoreProductController extends Controller
 {
     // Public product list
-    // public function index()
-    // {
-    //     $products = Product::with('category', 'user')->latest()->get();
-    //     return view('products.index', compact('products'));
-    // }
+    
     public function index(Request $request)
     {
         $query = Product::with('category', 'user')->latest();
@@ -63,16 +60,23 @@ class StoreProductController extends Controller
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image'       => 'nullable|image|max:2048',
+            'images.*'    => 'nullable|image|max:2048', // multiple files
         ]);
 
         $data['user_id'] = Auth::id();
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
-        }
+        $product = Product::create($data);
 
-        Product::create($data);
+        // Save multiple images if uploaded
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('products/gallery', 'public');
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                ]);
+            }
+        }
 
         return redirect()->route('products.my')->with('status', 'Product created!');
     }
@@ -95,7 +99,7 @@ class StoreProductController extends Controller
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image'       => 'nullable|image|max:2048',
+            'images.*'    => 'nullable|image|max:2048', // multiple files
         ]);
 
         if ($request->hasFile('image')) {
