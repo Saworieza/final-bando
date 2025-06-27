@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Category;
+use App\Models\BlogCategory;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,10 +21,18 @@ class DatabaseSeeder extends Seeder
 
         Category::insert([
             ['name' => 'Automotive', 'slug' => 'automotive'],
-            ['name' => 'Industrial', 'slug' => 'industrail'],
+            ['name' => 'Industrial', 'slug' => 'industrial'],
             ['name' => 'Agricultural', 'slug' => 'agricultural'],
             ['name' => 'Conveyor', 'slug' => 'conveyor-belts'],
             ['name' => 'Belt Tools', 'slug' => 'tools'],
+        ]);
+
+        BlogCategory::insert([
+            ['name' => 'Automotive Literature', 'slug' => 'automotive-literature'],
+            ['name' => 'Industrial', 'slug' => 'industrial-literature'],
+            ['name' => 'Agricultural', 'slug' => 'agricultural-literature'],
+            ['name' => 'Conveyor', 'slug' => 'conveyor-literature'],
+            ['name' => 'Belt Tools', 'slug' => 'tools-literature'],
         ]);
 
     }

@@ -52,22 +52,32 @@
             </a>
 
             <!-- Knowledge Center (Blog) Dropdown -->
+            @php
+                use App\Models\BlogCategory;
+                $blogCategories = BlogCategory::all();
+            @endphp
+
             <div class="relative group">
                 <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-blue-600 focus:outline-none transition ease-in-out duration-150">
-                    Knowledge Center
+                    Blog
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
                 <div class="absolute hidden group-hover:block mt-2 bg-white border rounded shadow-md z-50 w-56">
-                    @foreach(App\Models\KnowledgeCategory::all() as $knowledge)
-                        <a href="{{ route('blog.category', ['slug' => $knowledge->slug]) }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            {{ $knowledge->name }}
-                        </a>
-                    @endforeach
+                    @if ($blogCategories->count())
+                        @foreach ($blogCategories as $category)
+                            <a href="{{ route('blog.category', ['slug' => $category->slug]) }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                {{ $category->name }}
+                            </a>
+                        @endforeach
+                    @else
+                        <span class="block px-4 py-2 text-sm text-gray-400">No categories</span>
+                    @endif
                 </div>
             </div>
+
 
             <!-- Search -->
             <form action="{{ route('search') }}" method="GET" class="relative">
