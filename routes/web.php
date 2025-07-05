@@ -30,35 +30,27 @@ Route::middleware('auth')->group(function () {
     Route::patch('/admin/approve-user/{user}', [AdminUserApprovalController::class, 'update'])
         ->name('admin.approve');
     
-    
-    // AUTH CRUD
-    // Authenticated (Seller/Admin only)
+    // AUTH CRUD - Products
     Route::get('/dashboard/products', [StoreProductController::class, 'myProducts'])->name('products.my');
     Route::resource('products', StoreProductController::class)->except(['index', 'show']);
-    // Manual CRUD routes (excluding index/show which are public)
-    
 });
 
-// PUBLIC viewable
-    Route::get('/products', [StoreProductController::class, 'index'])->name('products.index');
-    Route::get('/products/{product}', [StoreProductController::class, 'show'])->name('products.show');
+// PUBLIC viewable - Products
+Route::get('/products', [StoreProductController::class, 'index'])->name('products.index');
+Route::get('/products/{product}', [StoreProductController::class, 'show'])->name('products.show');
 
-Route::middleware(['role:Admin'])->prefix('admin')->group(function () {
+// ADMIN ONLY - Blog Management
+Route::middleware(['role:Admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('blog/posts', BlogPostController::class);
     Route::resource('blog/categories', BlogCategoryController::class);
 });
 
-Route::get('/blog', [PublicBlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/{slug}', [PublicBlogController::class, 'show'])->name('blog.show');
-Route::get('/blog/category/{slug}', [PublicBlogController::class, 'category'])->name('blog.category');
-
-
-// Public blog views
+// PUBLIC - Blog Views
 Route::get('/blog', [BlogPostController::class, 'publicIndex'])->name('blog.index');
 Route::get('/blog/category/{slug}', [BlogPostController::class, 'byCategory'])->name('blog.category');
 Route::get('/blog/{slug}', [BlogPostController::class, 'publicShow'])->name('blog.show');
 
-//Pending Approval
+// Other routes
 Route::view('/pending-approval', 'auth.pending-approval')->name('pending.approval');
 
 Route::get('/search', function () {
@@ -70,7 +62,7 @@ Route::get('/cart', function () {
 })->name('cart.index');
 
 Route::get('/distributors', function () {
-    return view('pages.distributors'); // or whatever view you want
+    return view('pages.distributors');
 })->name('distributors');
 
 Route::get('/lang/{locale}', function ($locale) {
@@ -79,9 +71,5 @@ Route::get('/lang/{locale}', function ($locale) {
     return back();
 })->name('lang.switch');
 
-
-
 // Breeze auth routes (login, register, etc.)
 require __DIR__.'/auth.php';
-
-

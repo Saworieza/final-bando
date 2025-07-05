@@ -15,4 +15,14 @@ class BlogCategory extends Model
     ];
 
     protected $table = 'blog_categories';
+
+    public function posts()
+    {
+        return $this->hasMany(BlogPost::class, 'blog_category_id');
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

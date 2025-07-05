@@ -164,24 +164,29 @@
                     <div class="px-6 py-4 border-b border-gray-200">
                         <div class="flex items-center justify-between">
                             <h3 class="text-lg font-medium text-gray-900">Recent Products</h3>
-                            <a href="{{ route('products.index') }}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+                            <div class="flex space-x-2">
+                                <a href="{{ route('products.create') }}" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                                    + Add New
+                                </a>
+                                <a href="{{ route('products.index') }}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+                            </div>
                         </div>
                     </div>
-                    {{-- Update the Recent Products section in your dashboard.blade.php --}}
                     <div class="p-0">
-                        @forelse($recentProducts as $product)
+                        @forelse($recentProducts ?? [] as $product)
                             <div class="px-6 py-4 border-b border-gray-100 last:border-b-0">
                                 <div class="flex items-center justify-between">
                                     <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">{{ $product->name ?? $product->title }}</p>
+                                        <div class="flex items-center space-x-3">
+                                            <a href="{{ route('products.show', $product->id) }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                                                {{ $product->name ?? $product->title }}
+                                            </a>
+                                            <a href="{{ route('products.edit', $product->id) }}" class="text-xs text-gray-500 hover:text-gray-700 underline">
+                                                Edit
+                                            </a>
+                                        </div>
                                         <p class="text-xs text-gray-500">
-                                            @if($product->category)
-                                                {{ $product->category->name ?? 'Uncategorized' }}
-                                            @elseif($product->author)
-                                                by {{ $product->author }}
-                                            @else
-                                                {{ $product->created_at->format('M j, Y') }}
-                                            @endif
+                                            {{ $product->category->name ?? 'Uncategorized' }} • {{ $product->created_at->format('M j, Y') }}
                                         </p>
                                     </div>
                                     <div class="text-right">
@@ -202,43 +207,6 @@
                             </div>
                         @endforelse
                     </div>
-
-                    {{-- Update the Recent Blog Posts section in your dashboard.blade.php --}}
-                    <div class="p-0">
-                        @forelse($recentPosts as $post)
-                            <div class="px-6 py-4 border-b border-gray-100 last:border-b-0">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">{{ $post->title }}</p>
-                                        <div class="flex items-center space-x-2 mt-1">
-                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                                @if($post->status === 'published')
-                                                    bg-green-100 text-green-800
-                                                @elseif($post->status === 'draft')
-                                                    bg-yellow-100 text-yellow-800
-                                                @else
-                                                    bg-gray-100 text-gray-800
-                                                @endif">
-                                                {{ ucfirst($post->status) }}
-                                            </span>
-                                            @if(isset($post->views_count))
-                                                <span class="text-xs text-gray-500">{{ $post->views_count }} views</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <p class="text-xs text-gray-500">{{ $post->created_at->format('M j, Y') }}</p>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="px-6 py-8 text-center text-gray-500">
-                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                                </svg>
-                                <p class="text-sm">No blog posts found</p>
-                                <p class="text-xs text-gray-400 mt-1">Blog posts will appear here once published</p>
-                            </div>
-                        @endforelse
-                    </div>
                 </div>
 
                 {{-- Recent Blog Posts --}}
@@ -246,7 +214,12 @@
                     <div class="px-6 py-4 border-b border-gray-200">
                         <div class="flex items-center justify-between">
                             <h3 class="text-lg font-medium text-gray-900">Recent Blog Posts</h3>
-                            <a href="{{ url('/admin/blog/posts') }}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+                            <div class="flex space-x-2">
+                                <a href="{{ route('posts.create') }}" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                    + Add New
+                                </a>
+                                <a href="{{ route('posts.index') }}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+                            </div>
                         </div>
                     </div>
                     <div class="p-0">
@@ -254,8 +227,20 @@
                             <div class="px-6 py-4 border-b border-gray-100 last:border-b-0">
                                 <div class="flex items-center justify-between">
                                     <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">{{ $post->title }}</p>
-                                        <div class="flex items-center space-x-2 mt-1">
+                                        <div class="flex items-center space-x-3">
+                                            <a href="{{ route('posts.show', $post->id) }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                                                {{ $post->title }}
+                                            </a>
+                                            <a href="{{ route('posts.edit', $post->id) }}" class="text-xs text-gray-500 hover:text-gray-700 underline">
+                                                Edit
+                                            </a>
+                                        </div>
+                                        <p class="text-xs text-gray-500">
+                                            {{ $post->category->name ?? 'Uncategorized' }} • {{ $post->created_at->format('M j, Y') }}
+                                        </p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-medium text-gray-900">
                                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                                                 @if($post->status === 'published')
                                                     bg-green-100 text-green-800
@@ -266,12 +251,11 @@
                                                 @endif">
                                                 {{ ucfirst($post->status) }}
                                             </span>
-                                            @if(isset($post->views_count))
-                                                <span class="text-xs text-gray-500">{{ $post->views_count }} views</span>
-                                            @endif
-                                        </div>
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            Views: {{ $post->views_count ?? 0 }}
+                                        </p>
                                     </div>
-                                    <p class="text-xs text-gray-500">{{ $post->created_at->format('M j, Y') }}</p>
                                 </div>
                             </div>
                         @empty

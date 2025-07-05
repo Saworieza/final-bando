@@ -80,20 +80,20 @@ class DashboardRedirectController extends Controller
         
         // Get current month sales data for this seller
         $currentMonth = Carbon::now()->startOfMonth();
-        $totalSales = Order::whereHas('items', function($query) use ($sellerId) {
-            $query->whereHas('product', function($q) use ($sellerId) {
-                $q->where('user_id', $sellerId);
-            });
-        })->where('created_at', '>=', $currentMonth)
-        ->where('status', 'completed')
-        ->sum('total_amount');
+        // $totalSales = Order::whereHas('items', function($query) use ($sellerId) {
+        //     $query->whereHas('product', function($q) use ($sellerId) {
+        //         $q->where('user_id', $sellerId);
+        //     });
+        // })->where('created_at', '>=', $currentMonth)
+        // ->where('status', 'completed')
+        // ->sum('total_amount');
         
         // Get total orders for this seller
-        $totalOrders = Order::whereHas('items', function($query) use ($sellerId) {
-            $query->whereHas('product', function($q) use ($sellerId) {
-                $q->where('user_id', $sellerId);
-            });
-        })->count();
+        // $totalOrders = Order::whereHas('items', function($query) use ($sellerId) {
+        //     $query->whereHas('product', function($q) use ($sellerId) {
+        //         $q->where('user_id', $sellerId);
+        //     });
+        // })->count();
         
         // Get low stock count for this seller's products
         $lowStockCount = Product::where('user_id', $sellerId)
@@ -109,8 +109,8 @@ class DashboardRedirectController extends Controller
             ->get();
         
         return [
-            'totalSales' => $totalSales,
-            'totalOrders' => $totalOrders,
+            // 'totalSales' => $totalSales,
+            // 'totalOrders' => $totalOrders,
             'lowStockCount' => $lowStockCount,
             'recentProducts' => $recentProducts
         ];
