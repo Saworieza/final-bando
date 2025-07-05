@@ -39,7 +39,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Total Sales (This Month)</p>
-                            <p class="text-2xl font-semibold text-gray-900">KSh {{ number_format(45000, 2) }}</p>
+                            <p class="text-2xl font-semibold text-gray-900">KSh {{ number_format($totalSales ?? 0, 2) }}</p>
                         </div>
                     </div>
                 </div>
@@ -54,7 +54,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Total Orders</p>
-                            <p class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 127 }}</p>
+                            <p class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">New Customers</p>
-                            <p class="text-2xl font-semibold text-gray-900">{{ $newCustomers ?? 23 }}</p>
+                            <p class="text-2xl font-semibold text-gray-900">{{ $newCustomers ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -84,7 +84,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Low Stock Alerts</p>
-                            <p class="text-2xl font-semibold text-gray-900">{{ $lowStockCount ?? 8 }}</p>
+                            <p class="text-2xl font-semibold text-gray-900">{{ $lowStockCount ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -158,7 +158,7 @@
             </div>
 
             {{-- Recent Activity Section --}}
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="grid grid-cols-2 gap-8 mb-8">
                 {{-- Recent Products --}}
                 <div class="bg-white rounded-lg shadow">
                     <div class="px-6 py-4 border-b border-gray-200">
@@ -167,34 +167,75 @@
                             <a href="{{ route('products.index') }}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
                         </div>
                     </div>
+                    {{-- Update the Recent Products section in your dashboard.blade.php --}}
                     <div class="p-0">
-                        @php
-                            // In a real app, this would come from your controller
-                            $recentProducts = collect([
-                                ['title' => 'Catholic Study Bible', 'author' => 'Various', 'price' => 2500, 'stock' => 15, 'created_at' => '2024-01-15'],
-                                ['title' => 'Mere Christianity', 'author' => 'C.S. Lewis', 'price' => 1200, 'stock' => 8, 'created_at' => '2024-01-14'],
-                                ['title' => 'The Purpose Driven Life', 'author' => 'Rick Warren', 'price' => 1500, 'stock' => 12, 'created_at' => '2024-01-13'],
-                                ['title' => 'Jesus Calling', 'author' => 'Sarah Young', 'price' => 1800, 'stock' => 5, 'created_at' => '2024-01-12'],
-                                ['title' => 'Catechism of the Catholic Church', 'author' => 'Catholic Church', 'price' => 3000, 'stock' => 3, 'created_at' => '2024-01-11'],
-                            ]);
-                        @endphp
-                        
                         @forelse($recentProducts as $product)
                             <div class="px-6 py-4 border-b border-gray-100 last:border-b-0">
                                 <div class="flex items-center justify-between">
                                     <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">{{ $product['title'] }}</p>
-                                        <p class="text-xs text-gray-500">by {{ $product['author'] }}</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ $product->name ?? $product->title }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            @if($product->category)
+                                                {{ $product->category->name ?? 'Uncategorized' }}
+                                            @elseif($product->author)
+                                                by {{ $product->author }}
+                                            @else
+                                                {{ $product->created_at->format('M j, Y') }}
+                                            @endif
+                                        </p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-medium text-gray-900">KSh {{ number_format($product['price']) }}</p>
-                                        <p class="text-xs text-gray-500">Stock: {{ $product['stock'] }}</p>
+                                        <p class="text-sm font-medium text-gray-900">KSh {{ number_format($product->price ?? 0) }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            Stock: {{ $product->stock ?? $product->quantity ?? 0 }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         @empty
-                            <div class="px-6 py-4 text-center text-gray-500">
-                                No products found
+                            <div class="px-6 py-8 text-center text-gray-500">
+                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                </svg>
+                                <p class="text-sm">No products found</p>
+                                <p class="text-xs text-gray-400 mt-1">Products will appear here once added</p>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    {{-- Update the Recent Blog Posts section in your dashboard.blade.php --}}
+                    <div class="p-0">
+                        @forelse($recentPosts as $post)
+                            <div class="px-6 py-4 border-b border-gray-100 last:border-b-0">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-900">{{ $post->title }}</p>
+                                        <div class="flex items-center space-x-2 mt-1">
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                                @if($post->status === 'published')
+                                                    bg-green-100 text-green-800
+                                                @elseif($post->status === 'draft')
+                                                    bg-yellow-100 text-yellow-800
+                                                @else
+                                                    bg-gray-100 text-gray-800
+                                                @endif">
+                                                {{ ucfirst($post->status) }}
+                                            </span>
+                                            @if(isset($post->views_count))
+                                                <span class="text-xs text-gray-500">{{ $post->views_count }} views</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500">{{ $post->created_at->format('M j, Y') }}</p>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="px-6 py-8 text-center text-gray-500">
+                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                                <p class="text-sm">No blog posts found</p>
+                                <p class="text-xs text-gray-400 mt-1">Blog posts will appear here once published</p>
                             </div>
                         @endforelse
                     </div>
@@ -209,35 +250,37 @@
                         </div>
                     </div>
                     <div class="p-0">
-                        @php
-                            $recentPosts = collect([
-                                ['title' => 'The Importance of Daily Prayer', 'status' => 'Published', 'views' => 245, 'created_at' => '2024-01-15'],
-                                ['title' => 'Book Review: The Screwtape Letters', 'status' => 'Published', 'views' => 189, 'created_at' => '2024-01-14'],
-                                ['title' => 'Understanding Catholic Social Teaching', 'status' => 'Draft', 'views' => 0, 'created_at' => '2024-01-13'],
-                                ['title' => 'Saints for Modern Times', 'status' => 'Published', 'views' => 312, 'created_at' => '2024-01-12'],
-                                ['title' => 'Preparing for Lent: A Spiritual Guide', 'status' => 'Published', 'views' => 156, 'created_at' => '2024-01-11'],
-                            ]);
-                        @endphp
-                        
-                        @forelse($recentPosts as $post)
+                        @forelse($recentPosts ?? [] as $post)
                             <div class="px-6 py-4 border-b border-gray-100 last:border-b-0">
                                 <div class="flex items-center justify-between">
                                     <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">{{ $post['title'] }}</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ $post->title }}</p>
                                         <div class="flex items-center space-x-2 mt-1">
                                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                                {{ $post['status'] === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                {{ $post['status'] }}
+                                                @if($post->status === 'published')
+                                                    bg-green-100 text-green-800
+                                                @elseif($post->status === 'draft')
+                                                    bg-yellow-100 text-yellow-800
+                                                @else
+                                                    bg-gray-100 text-gray-800
+                                                @endif">
+                                                {{ ucfirst($post->status) }}
                                             </span>
-                                            <span class="text-xs text-gray-500">{{ $post['views'] }} views</span>
+                                            @if(isset($post->views_count))
+                                                <span class="text-xs text-gray-500">{{ $post->views_count }} views</span>
+                                            @endif
                                         </div>
                                     </div>
-                                    <p class="text-xs text-gray-500">{{ $post['created_at'] }}</p>
+                                    <p class="text-xs text-gray-500">{{ $post->created_at->format('M j, Y') }}</p>
                                 </div>
                             </div>
                         @empty
-                            <div class="px-6 py-4 text-center text-gray-500">
-                                No blog posts found
+                            <div class="px-6 py-8 text-center text-gray-500">
+                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                                <p class="text-sm">No blog posts found</p>
+                                <p class="text-xs text-gray-400 mt-1">Blog posts will appear here once published</p>
                             </div>
                         @endforelse
                     </div>
