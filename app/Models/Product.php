@@ -40,7 +40,4 @@ class Product extends Model
         return $this->hasMany(Quote::class);
     }
 
-    
-
-
 }

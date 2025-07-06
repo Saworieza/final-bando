@@ -6,6 +6,8 @@ use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\AdminUserApprovalController;
 use App\Http\Controllers\StoreProductController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\QuoteResponseController;
 
 // Public homepage
 Route::get('/', function () {
@@ -41,6 +43,12 @@ Route::get('/products/{product}', [StoreProductController::class, 'show'])->name
 Route::resource('news', NewsController::class)->only([
     'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
 ]);
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('quotes', QuoteController::class)->except(['edit', 'update']);
+    Route::post('quotes/{quote}/responses', [QuoteResponseController::class, 'store'])
+        ->name('quotes.responses.store');
+});
 
 // Other routes
 Route::view('/pending-approval', 'auth.pending-approval')->name('pending.approval');

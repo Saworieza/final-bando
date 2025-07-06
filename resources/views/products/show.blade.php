@@ -39,7 +39,7 @@
         <div class="bg-white p-6 rounded shadow">
             <div class="flex items-center justify-between mb-6">
                 <h4 class="text-lg font-semibold">Quote Requests</h4>
-                <span class="text-sm text-gray-500">{{ $product->quotes->count() }} requests</span>
+                <span class="text-sm text-gray-500">10 requests</span>
             </div>
 
             <!-- Quote Request Button/Form -->
@@ -123,63 +123,7 @@
                 </div>
             @endif
 
-            <!-- Quote Requests List -->
-            <div id="quotes-list" class="space-y-4">
-                @forelse($product->quotes->sortByDesc('created_at') as $quote)
-                    @if(auth()->check() && (auth()->user()->hasRole('Admin') || auth()->id() === $product->user_id || auth()->id() === $quote->buyer_id))
-                        <div class="border rounded-lg p-4 bg-white quote-item">
-                            <div class="flex items-start justify-between">
-                                <div class="flex items-start space-x-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <span class="text-sm font-medium text-blue-600">{{ $quote->buyer ? substr($quote->buyer->name, 0, 1) : 'U' }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-2">
-                                            <h6 class="font-medium text-gray-900">{{ $quote->buyer->name ?? 'Unknown User' }}</h6>
-                                            <span class="px-2 py-1 text-xs rounded-full 
-                                                @if($quote->status === 'pending') bg-yellow-100 text-yellow-800
-                                                @elseif($quote->status === 'replied') bg-blue-100 text-blue-800
-                                                @elseif($quote->status === 'accepted') bg-green-100 text-green-800
-                                                @elseif($quote->status === 'rejected') bg-red-100 text-red-800
-                                                @elseif($quote->status === 'fulfilled') bg-purple-100 text-purple-800
-                                                @endif">
-                                                {{ ucfirst($quote->status) }}
-                                            </span>
-                                        </div>
-                                        <p class="text-sm text-gray-600 mt-1">{{ $quote->message }}</p>
-                                        <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                                            <span>Qty: {{ $quote->quantity }}</span>
-                                            @if($quote->requested_price)
-                                                <span>Requested: KES {{ number_format($quote->requested_price, 2) }}</span>
-                                            @endif
-                                            @if($quote->quoted_price)
-                                                <span>Quoted: KES {{ number_format($quote->quoted_price, 2) }}</span>
-                                            @endif
-                                            <span>{{ $quote->created_at->diffForHumans() }}</span>
-                                        </div>
-                                        
-                                        @if($quote->seller_response && $quote->seller)
-                                            <div class="mt-3 pl-4 border-l-2 border-green-200 bg-green-50 p-3 rounded-r">
-                                                <div class="flex items-center space-x-2 mb-1">
-                                                    <span class="text-sm font-medium text-green-800">{{ $quote->seller->name ?? 'Unknown Seller' }}</span>
-                                                    <span class="text-xs text-green-600">{{ $quote->responded_at?->diffForHumans() }}</span>
-                                                </div>
-                                                <p class="text-sm text-green-700">{{ $quote->seller_response }}</p>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                @empty
-                    <div class="text-center py-8 text-gray-500">
-                        No quote requests yet.
-                    </div>
-                @endforelse
-            </div>
+           
         </div>
     </div>
 
@@ -195,7 +139,7 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
             
-            fetch('{{ route("quotes.store") }}', {
+            fetch('/', {
                 method: 'POST',
                 body: formData,
                 headers: {

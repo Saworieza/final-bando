@@ -74,4 +74,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Quote::class, 'seller_id');
     }
+
+    // app/Models/User.php
+    public function quotes()
+    {
+        return $this->hasMany(Quote::class, 'buyer_id');
+    }
+
+    public function quoteResponses()
+    {
+        return $this->hasMany(QuoteResponse::class, 'seller_id');
+    }
 }
