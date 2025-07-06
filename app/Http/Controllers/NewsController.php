@@ -45,7 +45,12 @@ class NewsController extends Controller
      */
     public function create()
     {
+        \Log::info('Categories count: ' . Category::count()); // Check categories
         $categories = Category::all();
+        
+        // Temporary dump (remove after debugging)
+        dd(view('news.create', compact('categories')));
+        
         return view('news.create', compact('categories'));
     }
 

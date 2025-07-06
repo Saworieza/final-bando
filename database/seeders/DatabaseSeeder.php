@@ -13,12 +13,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Run the role and user seeders
-        $this->call([
-            RoleSeeder::class,
-            AdminUserSeeder::class,
-        ]);
-
         Category::insert([
             ['name' => 'Automotive', 'slug' => 'automotive'],
             ['name' => 'Industrial', 'slug' => 'industrial'],
@@ -26,14 +20,15 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Conveyor', 'slug' => 'conveyor-belts'],
             ['name' => 'Belt Tools', 'slug' => 'tools'],
         ]);
-
-        BlogCategory::insert([
-            ['name' => 'Automotive Literature', 'slug' => 'automotive-literature'],
-            ['name' => 'Industrial', 'slug' => 'industrial-literature'],
-            ['name' => 'Agricultural', 'slug' => 'agricultural-literature'],
-            ['name' => 'Conveyor', 'slug' => 'conveyor-literature'],
-            ['name' => 'Belt Tools', 'slug' => 'tools-literature'],
+        
+        // Run the role and user seeders
+        $this->call([
+            RoleSeeder::class,
+            AdminUserSeeder::class,
+            NewsSeeder::class,
         ]);
+
+        
 
         Quote::factory()->create([
             'product_id' => 1,

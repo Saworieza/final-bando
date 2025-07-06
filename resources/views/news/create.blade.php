@@ -1,4 +1,10 @@
 @extends('layouts.app')
+{{ dd($categories) }}
+
+@section('content')
+    <h1>TEST PAGE</h1>
+    <p>Simple test to verify layout works</p>
+@endsection
 
 @section('content')
 <div class="container py-5">
