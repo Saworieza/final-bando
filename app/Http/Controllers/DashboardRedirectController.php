@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
-use App\Models\BlogPost;
+// use App\Models\BlogPost;
 use App\Models\User;
 use App\Models\Order;
 use Carbon\Carbon;
@@ -60,9 +60,9 @@ class DashboardRedirectController extends Controller
             ->get();
         
         // Get recent blog posts (latest 5)
-        $recentPosts = BlogPost::latest()
-            ->take(5)
-            ->get();
+        // $recentPosts = BlogPost::latest()
+        //     ->take(5)
+        //     ->get();
         
         return [
             // 'totalSales' => $totalSales,
@@ -70,7 +70,7 @@ class DashboardRedirectController extends Controller
             'newCustomers' => $newCustomers,
             'lowStockCount' => $lowStockCount,
             'recentProducts' => $recentProducts,
-            'recentPosts' => $recentPosts
+            // 'recentPosts' => $recentPosts
         ];
     }
 

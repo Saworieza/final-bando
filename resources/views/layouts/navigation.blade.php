@@ -52,11 +52,7 @@
             </a>
 
             <!-- Knowledge Center (Blog) Dropdown -->
-            @php
-                use App\Models\BlogCategory;
-                $blogCategories = BlogCategory::all();
-            @endphp
-
+            
             <div class="relative group">
                 <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-blue-600 focus:outline-none transition ease-in-out duration-150">
                     Blog
@@ -65,16 +61,7 @@
                     </svg>
                 </button>
                 <div class="absolute hidden group-hover:block mt-2 bg-white border rounded shadow-md z-50 w-56">
-                    @if ($blogCategories->count())
-                        @foreach ($blogCategories as $category)
-                            <a href="{{ route('blog.category', ['slug' => $category->slug]) }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                {{ $category->name }}
-                            </a>
-                        @endforeach
-                    @else
-                        <span class="block px-4 py-2 text-sm text-gray-400">No categories</span>
-                    @endif
+                   
                 </div>
             </div>
 

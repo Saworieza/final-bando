@@ -8,11 +8,11 @@
                 <a href="{{ route('products.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                     + Add Product
                 </a>
-                @can('create', App\Models\BlogPost::class)
-                    <a href="{{ url('/admin/blog/posts/create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                
+                    <a href="/" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
                         + New Blog Post
                     </a>
-                @endcan
+                
             </div>
         </div>
     </x-slot>
@@ -215,10 +215,10 @@
                         <div class="flex items-center justify-between">
                             <h3 class="text-lg font-medium text-gray-900">Recent Blog Posts</h3>
                             <div class="flex space-x-2">
-                                <a href="{{ route('posts.create') }}" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                <a href="/" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
                                     + Add New
                                 </a>
-                                <a href="{{ route('posts.index') }}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+                                <a href="/" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
                             </div>
                         </div>
                     </div>

@@ -18,11 +18,6 @@
             <p class="text-gray-600 mb-1">Category: <strong>{{ $product->category->name ?? 'Uncategorized' }}</strong></p>
             <p class="text-gray-700 mb-4">{{ $product->description }}</p>
             <p class="text-lg font-semibold text-green-700 mb-4">KES {{ number_format($product->price, 2) }}</p>
-
-            <!-- Quote Request Button -->
-            <div class="mt-4">
-                @include('partials.quote-button', ['product' => $product])
-            </div>
         </div>
 
         @if ($product->images->count())
@@ -47,13 +42,24 @@
                 <span class="text-sm text-gray-500">{{ $product->quotes->count() }} requests</span>
             </div>
 
-            @if(auth()->check() && auth()->user()->hasRole('Buyer') && auth()->id() !== $product->user_id)
-                <!-- Quote Request Form -->
+            <!-- Quote Request Button/Form -->
+            @if(!auth()->check())
+                <!-- Not logged in - Show login prompt -->
+                <div class="mb-6 border rounded-lg p-4 bg-gray-50 text-center">
+                    <p class="text-gray-600 mb-3">Want to request a quote for this product?</p>
+                    <a href="{{ route('login') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Login to Request Quote
+                    </a>
+                </div>
+            @elseif(auth()->user()->hasRole('Buyer') && auth()->id() !== $product->user_id)
+                <!-- Buyer logged in - Show quote form -->
                 <div class="mb-6 border rounded-lg p-4 bg-gray-50">
                     <h5 class="font-medium mb-3">Request a Quote</h5>
                     <form id="quote-form" class="space-y-4">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="seller_id" value="{{ $product->user_id }}">
+                        <input type="hidden" name="item_name" value="{{ $product->name }}">
                         
                         <div>
                             <label for="message" class="block text-sm font-medium text-gray-700">Message *</label>
@@ -62,39 +68,56 @@
                                 name="message" 
                                 rows="3" 
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                placeholder="Describe your requirements..."
+                                placeholder="Describe your requirements, delivery timeline, etc..."
                                 required></textarea>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity *</label>
                                 <input 
                                     type="number" 
                                     id="quantity" 
                                     name="quantity" 
                                     min="1" 
                                     value="1"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required>
                             </div>
                             
                             <div>
                                 <label for="requested_price" class="block text-sm font-medium text-gray-700">Requested Price (Optional)</label>
-                                <input 
-                                    type="number" 
-                                    id="requested_price" 
-                                    name="requested_price" 
-                                    min="0" 
-                                    step="0.01"
-                                    placeholder="0.00"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 sm:text-sm">KES</span>
+                                    </div>
+                                    <input 
+                                        type="number" 
+                                        id="requested_price" 
+                                        name="requested_price" 
+                                        min="0" 
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        class="block w-full pl-12 pr-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
                             </div>
                         </div>
                         
                         <button 
                             type="submit" 
-                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50">
                             Send Quote Request
+                        </button>
+                    </form>
+                </div>
+            @elseif(auth()->check() && !auth()->user()->hasRole('Buyer'))
+                <!-- Logged in but not as buyer - Show role switch -->
+                <div class="mb-6 border rounded-lg p-4 bg-gray-50 text-center">
+                    <p class="text-gray-600 mb-3">You need to be logged in as a buyer to request quotes.</p>
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Log in as Buyer
                         </button>
                     </form>
                 </div>
@@ -103,8 +126,53 @@
             <!-- Quote Requests List -->
             <div id="quotes-list" class="space-y-4">
                 @forelse($product->quotes->sortByDesc('created_at') as $quote)
-                    @if(auth()->check() && (auth()->user()->hasRole('Admin') || auth()->id() === $product->user_id || auth()->id() === $quote->user_id))
-                        @include('partials.quote-item', ['quote' => $quote])
+                    @if(auth()->check() && (auth()->user()->hasRole('Admin') || auth()->id() === $product->user_id || auth()->id() === $quote->buyer_id))
+                        <div class="border rounded-lg p-4 bg-white quote-item">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-medium text-blue-600">{{ $quote->buyer ? substr($quote->buyer->name, 0, 1) : 'U' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-2">
+                                            <h6 class="font-medium text-gray-900">{{ $quote->buyer->name ?? 'Unknown User' }}</h6>
+                                            <span class="px-2 py-1 text-xs rounded-full 
+                                                @if($quote->status === 'pending') bg-yellow-100 text-yellow-800
+                                                @elseif($quote->status === 'replied') bg-blue-100 text-blue-800
+                                                @elseif($quote->status === 'accepted') bg-green-100 text-green-800
+                                                @elseif($quote->status === 'rejected') bg-red-100 text-red-800
+                                                @elseif($quote->status === 'fulfilled') bg-purple-100 text-purple-800
+                                                @endif">
+                                                {{ ucfirst($quote->status) }}
+                                            </span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-1">{{ $quote->message }}</p>
+                                        <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                                            <span>Qty: {{ $quote->quantity }}</span>
+                                            @if($quote->requested_price)
+                                                <span>Requested: KES {{ number_format($quote->requested_price, 2) }}</span>
+                                            @endif
+                                            @if($quote->quoted_price)
+                                                <span>Quoted: KES {{ number_format($quote->quoted_price, 2) }}</span>
+                                            @endif
+                                            <span>{{ $quote->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        
+                                        @if($quote->seller_response && $quote->seller)
+                                            <div class="mt-3 pl-4 border-l-2 border-green-200 bg-green-50 p-3 rounded-r">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <span class="text-sm font-medium text-green-800">{{ $quote->seller->name ?? 'Unknown Seller' }}</span>
+                                                    <span class="text-xs text-green-600">{{ $quote->responded_at?->diffForHumans() }}</span>
+                                                </div>
+                                                <p class="text-sm text-green-700">{{ $quote->seller_response }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     @endif
                 @empty
                     <div class="text-center py-8 text-gray-500">
@@ -127,7 +195,7 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
             
-            fetch('{{ route("quotes.quick-store") }}', {
+            fetch('{{ route("quotes.store") }}', {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -140,28 +208,26 @@
                 if (data.success) {
                     // Reset form
                     this.reset();
+                    document.getElementById('quantity').value = 1;
                     
                     // Show success message
-                    showAlert('success', data.message);
+                    showAlert('success', data.message || 'Quote request sent successfully!');
                     
-                    // Add new quote to the list
-                    const quotesList = document.getElementById('quotes-list');
-                    if (data.quote_html) {
-                        const emptyState = quotesList.querySelector('.text-center.py-8');
-                        if (emptyState) {
-                            emptyState.remove();
-                        }
-                        quotesList.insertAdjacentHTML('afterbegin', data.quote_html);
-                    }
-                    
-                    // Update quote count
-                    const countElement = document.querySelector('.text-sm.text-gray-500');
-                    if (countElement) {
-                        const currentCount = parseInt(countElement.textContent.match(/\d+/)[0]) || 0;
-                        countElement.textContent = `${currentCount + 1} requests`;
-                    }
+                    // Refresh the page to show the new quote
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 } else {
-                    showAlert('error', data.error || 'An error occurred');
+                    // Handle validation errors
+                    if (data.errors) {
+                        let errorMessage = 'Please fix the following errors:\n';
+                        for (let field in data.errors) {
+                            errorMessage += `• ${data.errors[field][0]}\n`;
+                        }
+                        showAlert('error', errorMessage);
+                    } else {
+                        showAlert('error', data.message || 'An error occurred');
+                    }
                 }
             })
             .catch(error => {
@@ -176,10 +242,16 @@
         
         function showAlert(type, message) {
             const alertDiv = document.createElement('div');
-            alertDiv.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-md shadow-lg ${
+            alertDiv.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-md shadow-lg max-w-md ${
                 type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'
             }`;
-            alertDiv.textContent = message;
+            
+            if (type === 'error' && message.includes('\n')) {
+                // Handle multi-line error messages
+                alertDiv.innerHTML = `<pre class="whitespace-pre-wrap text-sm">${message}</pre>`;
+            } else {
+                alertDiv.textContent = message;
+            }
             
             document.body.appendChild(alertDiv);
             
