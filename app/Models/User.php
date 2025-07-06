@@ -54,6 +54,11 @@ class User extends Authenticatable
         return $this->hasMany(Product::class);
     }
 
+    public function news(): HasMany
+    {
+        return $this->hasMany(News::class);
+    }
+
     /**
      * Quotes requested by this user (as buyer)
      */

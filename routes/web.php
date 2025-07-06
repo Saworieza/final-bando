@@ -5,9 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\AdminUserApprovalController;
 use App\Http\Controllers\StoreProductController;
-use App\Http\Controllers\BlogPostController;
-use App\Http\Controllers\BlogCategoryController;
-use App\Http\Controllers\PublicBlogController;
+use App\Http\Controllers\NewsController;
 
 // Public homepage
 Route::get('/', function () {
@@ -40,16 +38,9 @@ Route::middleware('auth')->group(function () {
 Route::get('/products', [StoreProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [StoreProductController::class, 'show'])->name('products.show');
 
-// ADMIN ONLY - Blog Management
-Route::middleware(['role:Admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('blog/posts', BlogPostController::class);
-    Route::resource('blog/categories', BlogCategoryController::class);
-});
-
-// PUBLIC - Blog Views
-Route::get('/blog', [BlogPostController::class, 'publicIndex'])->name('blog.index');
-Route::get('/blog/category/{slug}', [BlogPostController::class, 'byCategory'])->name('blog.category');
-Route::get('/blog/{slug}', [BlogPostController::class, 'publicShow'])->name('blog.show');
+Route::resource('news', NewsController::class)->only([
+    'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
+]);
 
 // Other routes
 Route::view('/pending-approval', 'auth.pending-approval')->name('pending.approval');
