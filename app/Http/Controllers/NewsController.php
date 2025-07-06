@@ -32,12 +32,16 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $news = News::with(['category', 'user'])
-                    ->where('is_published', true)
-                    ->latest()
-                    ->paginate(10);
+        try{
+            $news = News::with(['category', 'user'])
+                        // ->where('is_published', true)
+                        ->latest()
+                        ->paginate(10);
 
-        return view('news.index', compact('news'));
+            return view('news.index', compact('news'));
+        }catch (\Exception $e) {
+            dd($e->getMessage()); // This will show you the exact error
+        }
     }
 
     /**
@@ -49,7 +53,7 @@ class NewsController extends Controller
         $categories = Category::all();
         
         // Temporary dump (remove after debugging)
-        dd(view('news.create', compact('categories')));
+        // dd(view('news.create', compact('categories')));
         
         return view('news.create', compact('categories'));
     }

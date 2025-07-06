@@ -41,4 +41,10 @@ class News extends Model
     {
         return $this->media()->where('file_type', 'file');
     }
+
+    // In your News model (app/Models/News.php)
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

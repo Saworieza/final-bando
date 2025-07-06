@@ -1,48 +1,97 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="d-flex justify-content-between align-items-center mb-5">
-                <h1 class="fw-bold">Latest News</h1>
-                @can('create', App\Models\News::class)
-                <a href="{{ route('news.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-lg"></i> Create News
-                </a>
-                @endcan
-            </div>
-
-            @forelse($news as $item)
-            <div class="card mb-4 shadow-sm">
-                @if($item->images->count() > 0)
-                <img src="{{ Storage::url($item->images->first()->file_path) }}" class="card-img-top" alt="{{ $item->title }}" style="height: 300px; object-fit: cover;">
-                @endif
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="badge bg-primary">{{ $item->category->name }}</span>
-                        <small class="text-muted">{{ $item->created_at->diffForHumans() }}</small>
-                    </div>
-                    <h2 class="card-title fw-bold">
-                        <a href="{{ route('news.show', $item->slug) }}" class="text-decoration-none text-dark">{{ $item->title }}</a>
-                    </h2>
-                    <p class="card-text">{{ Str::limit(strip_tags($item->content), 200) }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{{ route('news.show', $item->slug) }}" class="btn btn-outline-primary">Read More</a>
-                        <small class="text-muted">By {{ $item->user->name }}</small>
+<div id="news-index" class="container mx-auto px-4 py-8">
+    @if($news->count() > 0)
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            @foreach($news as $item)
+                <div class="news-card bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+                     @click="openNews('{{ route('news.show', $item->slug) }}')">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold">
+                                {{ $item->category->name }}
+                            </span>
+                            <span class="text-gray-500 text-sm">{{ $item->created_at->format('M d, Y') }}</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                            {{ $item->title }}
+                        </h3>
+                        
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            {{ Str::limit($item->content, 150) }}
+                        </p>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-sm text-gray-500">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                </svg>
+                                {{ $item->user->name }}
+                            </div>
+                            
+                            <a 
+                                href="{{ route('news.show', $item->slug) }}"
+                                class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
+                                @click.stop
+                            >
+                                Read More
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            @empty
-            <div class="alert alert-info">
-                No news articles found.
-            </div>
-            @endforelse
-
-            <div class="d-flex justify-content-center mt-4">
-                {{ $news->links() }}
-            </div>
+            @endforeach
         </div>
-    </div>
+        
+        <div class="mt-8 flex justify-center">
+            {{ $news->links() }}
+        </div>
+    @else
+        <div class="text-center py-12">
+            <div class="text-6xl mb-4">📰</div>
+            <h3 class="text-2xl font-semibold text-gray-900 mb-2">No News Articles</h3>
+            <p class="text-gray-600 max-w-md mx-auto">There are no news articles to display at the moment.</p>
+        </div>
+    @endif
 </div>
+
+<script>
+// Initialize Vue app for this page
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('news-index')) {
+        new Vue({
+            el: '#news-index',
+            methods: {
+                openNews(url) {
+                    window.location.href = url;
+                }
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.news-card {
+    cursor: pointer;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
 @endsection
