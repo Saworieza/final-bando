@@ -9,10 +9,9 @@
                     + Add Product
                 </a>
                 
-                    <a href="/" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                        + New Blog Post
-                    </a>
-                
+                <a href="{{ route('news.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    + New Article
+                </a>
             </div>
         </div>
     </x-slot>
@@ -120,31 +119,31 @@
                     </div>
                 </a>
 
-                <a href="{{ url('/admin/blog/posts') }}" class="bg-green-50 border border-green-200 rounded-lg p-4 hover:bg-green-100 transition-colors">
+                <a href="{{ route('news.index') }}" class="bg-green-50 border border-green-200 rounded-lg p-4 hover:bg-green-100 transition-colors">
                     <div class="flex items-center">
                         <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
                         </svg>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-green-900">Manage Blog</p>
-                            <p class="text-xs text-green-700">Posts & Categories</p>
+                            <p class="text-sm font-medium text-green-900">Manage News</p>
+                            <p class="text-xs text-green-700">Articles & Updates</p>
                         </div>
                     </div>
                 </a>
 
-                <a href="{{ url('/admin/blog/categories') }}" class="bg-purple-50 border border-purple-200 rounded-lg p-4 hover:bg-purple-100 transition-colors">
+                <a href="/" class="bg-purple-50 border border-purple-200 rounded-lg p-4 hover:bg-purple-100 transition-colors">
                     <div class="flex items-center">
                         <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                         </svg>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-purple-900">Categories</p>
-                            <p class="text-xs text-purple-700">Organize content</p>
+                            <p class="text-sm font-medium text-purple-900">News Categories</p>
+                            <p class="text-xs text-purple-700">Organize articles</p>
                         </div>
                     </div>
                 </a>
 
-                <a href="#" class="bg-orange-50 border border-orange-200 rounded-lg p-4 hover:bg-orange-100 transition-colors">
+                <a href="/" class="bg-orange-50 border border-orange-200 rounded-lg p-4 hover:bg-orange-100 transition-colors">
                     <div class="flex items-center">
                         <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z"></path>
@@ -209,51 +208,62 @@
                     </div>
                 </div>
 
-                {{-- Recent Blog Posts --}}
+                {{-- Last Five News Posts --}}
                 <div class="bg-white rounded-lg shadow">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-medium text-gray-900">Recent Blog Posts</h3>
+                            <h3 class="text-lg font-medium text-gray-900">Latest News Posts</h3>
                             <div class="flex space-x-2">
-                                <a href="/" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                <a href="{{ route('news.create') }}" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
                                     + Add New
                                 </a>
-                                <a href="/" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+                                <a href="{{ route('news.index') }}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
                             </div>
                         </div>
                     </div>
                     <div class="p-0">
-                        @forelse($recentPosts ?? [] as $post)
+                        @php
+                            // Fetch the last 5 news posts ordered by creation date
+                            $lastFiveNews = \App\Models\News::orderBy('created_at', 'desc')->take(5)->get();
+                        @endphp
+                        
+                        @forelse($lastFiveNews as $article)
                             <div class="px-6 py-4 border-b border-gray-100 last:border-b-0">
                                 <div class="flex items-center justify-between">
                                     <div class="flex-1">
                                         <div class="flex items-center space-x-3">
-                                            <a href="{{ route('posts.show', $post->id) }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">
-                                                {{ $post->title }}
+                                            <a href="{{ route('news.show', $article->slug) }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                                                {{ Str::limit($article->title, 50) }}
                                             </a>
-                                            <a href="{{ route('posts.edit', $post->id) }}" class="text-xs text-gray-500 hover:text-gray-700 underline">
+                                            <a href="{{ route('news.edit', $article->id) }}" class="text-xs text-gray-500 hover:text-gray-700 underline">
                                                 Edit
                                             </a>
                                         </div>
                                         <p class="text-xs text-gray-500">
-                                            {{ $post->category->name ?? 'Uncategorized' }} • {{ $post->created_at->format('M j, Y') }}
+                                            {{ $article->category->name ?? 'Uncategorized' }} • {{ $article->created_at->format('M j, Y') }}
                                         </p>
+                                        @if($article->excerpt)
+                                            <p class="text-xs text-gray-400 mt-1">{{ Str::limit($article->excerpt, 60) }}</p>
+                                        @endif
                                     </div>
                                     <div class="text-right">
                                         <p class="text-sm font-medium text-gray-900">
                                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                                @if($post->status === 'published')
+                                                @if($article->status === 'published')
                                                     bg-green-100 text-green-800
-                                                @elseif($post->status === 'draft')
+                                                @elseif($article->status === 'draft')
                                                     bg-yellow-100 text-yellow-800
                                                 @else
                                                     bg-gray-100 text-gray-800
                                                 @endif">
-                                                {{ ucfirst($post->status) }}
+                                                {{ ucfirst($article->status) }}
                                             </span>
                                         </p>
-                                        <p class="text-xs text-gray-500">
-                                            Views: {{ $post->views_count ?? 0 }}
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            Views: {{ $article->views_count ?? 0 }}
+                                        </p>
+                                        <p class="text-xs text-gray-400">
+                                            {{ $article->created_at->diffForHumans() }}
                                         </p>
                                     </div>
                                 </div>
@@ -261,10 +271,10 @@
                         @empty
                             <div class="px-6 py-8 text-center text-gray-500">
                                 <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
                                 </svg>
-                                <p class="text-sm">No blog posts found</p>
-                                <p class="text-xs text-gray-400 mt-1">Blog posts will appear here once published</p>
+                                <p class="text-sm">No news articles found</p>
+                                <p class="text-xs text-gray-400 mt-1">News articles will appear here once published</p>
                             </div>
                         @endforelse
                     </div>
