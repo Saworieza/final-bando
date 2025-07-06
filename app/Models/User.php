@@ -53,4 +53,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Product::class);
     }
+
+    public function quotesRequested()
+    {
+        return $this->hasMany(Quote::class, 'buyer_id');
+    }
+
+    public function quotesReceived()
+    {
+        return $this->hasMany(Quote::class, 'seller_id');
+    }
+
 }

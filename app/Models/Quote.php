@@ -11,9 +11,7 @@ class Quote extends Model
 
     protected $fillable = [
         'product_id',
-        'buyer_id',
-        'seller_id',
-        'item_name',
+        'user_id', // The buyer who requested the quote
         'message',
         'quantity',
         'requested_price',
@@ -38,27 +36,37 @@ class Quote extends Model
     }
 
     /**
-     * Get the buyer who requested this quote.
+     * Get the user (buyer) who requested this quote.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the buyer who requested this quote (alias for user).
      */
     public function buyer()
     {
-        return $this->belongsTo(User::class, 'buyer_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
-     * Get the seller who owns the product.
+     * Get the seller who owns the product (through product relationship).
      */
     public function seller()
     {
-        return $this->belongsTo(User::class, 'seller_id');
+        return $this->hasOneThrough(User::class, Product::class, 'id', 'id', 'product_id', 'user_id');
     }
 
     /**
-     * Scope a query to only include quotes for a specific seller.
+     * Scope a query to only include quotes for products owned by a specific seller.
      */
     public function scopeForSeller($query, $sellerId)
     {
-        return $query->where('seller_id', $sellerId);
+        return $query->whereHas('product', function ($q) use ($sellerId) {
+            $q->where('user_id', $sellerId);
+        });
     }
 
     /**
@@ -66,7 +74,7 @@ class Quote extends Model
      */
     public function scopeForBuyer($query, $buyerId)
     {
-        return $query->where('buyer_id', $buyerId);
+        return $query->where('user_id', $buyerId);
     }
 
     /**
@@ -75,6 +83,14 @@ class Quote extends Model
     public function scopeWithStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Scope a query to only include quotes for a specific product.
+     */
+    public function scopeForProduct($query, $productId)
+    {
+        return $query->where('product_id', $productId);
     }
 
     /**
@@ -167,5 +183,13 @@ class Quote extends Model
     public function markAsFulfilled()
     {
         $this->update(['status' => 'fulfilled']);
+    }
+
+    /**
+     * Get the item name (product name).
+     */
+    public function getItemNameAttribute()
+    {
+        return $this->product->name;
     }
 }

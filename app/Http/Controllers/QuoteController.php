@@ -10,21 +10,18 @@ use Illuminate\Support\Facades\Auth;
 
 class QuoteController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware('role:Buyer')->only(['store']);
-        $this->middleware('role:Seller|Admin')->only(['show', 'update', 'destroy']);
-    }
-
     /**
      * Display a listing of quotes.
      */
     public function index(Request $request)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $user = Auth::user();
         
-        $query = Quote::with(['product', 'buyer', 'seller'])
+        $query = Quote::with(['product', 'user'])
             ->orderBy('created_at', 'desc');
 
         // Filter based on user role
@@ -46,27 +43,14 @@ class QuoteController extends Controller
     }
 
     /**
-     * Show the form for creating a new quote.
-     */
-    public function create(Product $product)
-    {
-        // Check if user is authenticated and is a buyer
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('message', 'Please log in to request a quote.');
-        }
-
-        if (!Auth::user()->hasRole('Buyer')) {
-            return redirect()->back()->with('error', 'Only buyers can request quotes.');
-        }
-
-        return view('quotes.create', compact('product'));
-    }
-
-    /**
      * Store a newly created quote in storage.
      */
     public function store(QuoteRequest $request)
     {
+        if (!Auth::check() || !Auth::user()->hasRole('Buyer')) {
+            return redirect()->back()->with('error', 'Only buyers can create quotes.');
+        }
+
         $product = Product::findOrFail($request->product_id);
         
         // Prevent buyers from requesting quotes for their own products
@@ -76,15 +60,14 @@ class QuoteController extends Controller
 
         $quote = Quote::create([
             'product_id' => $product->id,
-            'buyer_id' => Auth::id(),
-            'seller_id' => $product->user_id,
-            'item_name' => $product->name,
+            'user_id' => Auth::id(),
             'message' => $request->message,
             'quantity' => $request->quantity ?? 1,
             'requested_price' => $request->requested_price,
+            'status' => 'pending',
         ]);
 
-        return redirect()->route('quotes.show', $quote)
+        return redirect()->route('products.show', $product)
             ->with('success', 'Quote request sent successfully!');
     }
 
@@ -93,9 +76,13 @@ class QuoteController extends Controller
      */
     public function show(Quote $quote)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $this->authorize('view', $quote);
         
-        $quote->load(['product', 'buyer', 'seller']);
+        $quote->load(['product', 'user']);
         
         return view('quotes.show', compact('quote'));
     }
@@ -105,6 +92,10 @@ class QuoteController extends Controller
      */
     public function edit(Quote $quote)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $this->authorize('update', $quote);
         
         return view('quotes.edit', compact('quote'));
@@ -115,17 +106,33 @@ class QuoteController extends Controller
      */
     public function update(Request $request, Quote $quote)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $this->authorize('update', $quote);
 
+        // Handle seller response
+        if ($request->has('quoted_price') && $request->has('seller_response')) {
+            $request->validate([
+                'quoted_price' => 'required|numeric|min:0',
+                'seller_response' => 'required|string|max:1000',
+            ]);
+
+            $quote->markAsReplied($request->quoted_price, $request->seller_response);
+            
+            return redirect()->route('products.show', $quote->product)
+                ->with('success', 'Quote response sent successfully!');
+        }
+
+        // Handle status updates
         $request->validate([
-            'quoted_price' => 'required|numeric|min:0',
-            'seller_response' => 'required|string|max:1000',
+            'status' => 'in:pending,replied,accepted,rejected,fulfilled',
         ]);
 
-        $quote->markAsReplied($request->quoted_price, $request->seller_response);
+        $quote->update($request->only('status'));
 
-        return redirect()->route('quotes.show', $quote)
-            ->with('success', 'Quote response sent successfully!');
+        return back()->with('success', 'Quote updated');
     }
 
     /**
@@ -133,11 +140,16 @@ class QuoteController extends Controller
      */
     public function destroy(Quote $quote)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $this->authorize('delete', $quote);
         
+        $product = $quote->product;
         $quote->delete();
 
-        return redirect()->route('quotes.index')
+        return redirect()->route('products.show', $product)
             ->with('success', 'Quote deleted successfully!');
     }
 
@@ -146,11 +158,15 @@ class QuoteController extends Controller
      */
     public function accept(Quote $quote)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $this->authorize('accept', $quote);
         
         $quote->markAsAccepted();
 
-        return redirect()->route('quotes.show', $quote)
+        return redirect()->route('products.show', $quote->product)
             ->with('success', 'Quote accepted successfully!');
     }
 
@@ -159,11 +175,15 @@ class QuoteController extends Controller
      */
     public function reject(Quote $quote)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $this->authorize('reject', $quote);
         
         $quote->markAsRejected();
 
-        return redirect()->route('quotes.show', $quote)
+        return redirect()->route('products.show', $quote->product)
             ->with('success', 'Quote rejected.');
     }
 
@@ -172,11 +192,15 @@ class QuoteController extends Controller
      */
     public function fulfill(Quote $quote)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $this->authorize('fulfill', $quote);
         
         $quote->markAsFulfilled();
 
-        return redirect()->route('quotes.show', $quote)
+        return redirect()->route('products.show', $quote->product)
             ->with('success', 'Quote marked as fulfilled!');
     }
 
@@ -185,6 +209,10 @@ class QuoteController extends Controller
      */
     public function quickStore(Request $request)
     {
+        if (!Auth::check() || !Auth::user()->hasRole('Buyer')) {
+            return response()->json(['error' => 'Only buyers can create quotes.'], 403);
+        }
+
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'message' => 'required|string|max:1000',
@@ -200,18 +228,43 @@ class QuoteController extends Controller
 
         $quote = Quote::create([
             'product_id' => $product->id,
-            'buyer_id' => Auth::id(),
-            'seller_id' => $product->user_id,
-            'item_name' => $product->name,
+            'user_id' => Auth::id(),
             'message' => $request->message,
             'quantity' => $request->quantity ?? 1,
             'requested_price' => $request->requested_price,
+            'status' => 'pending',
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Quote request sent successfully!',
-            'quote_id' => $quote->id
+            'quote_id' => $quote->id,
+            'quote_html' => view('partials.quote-item', compact('quote'))->render()
+        ]);
+    }
+
+    /**
+     * Quick respond to quote via AJAX (for product show page).
+     */
+    public function quickRespond(Request $request, Quote $quote)
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Authentication required.'], 401);
+        }
+
+        $this->authorize('update', $quote);
+
+        $request->validate([
+            'quoted_price' => 'required|numeric|min:0',
+            'seller_response' => 'required|string|max:1000',
+        ]);
+
+        $quote->markAsReplied($request->quoted_price, $request->seller_response);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Quote response sent successfully!',
+            'quote_html' => view('partials.quote-item', compact('quote'))->render()
         ]);
     }
 }

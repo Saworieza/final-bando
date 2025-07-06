@@ -8,6 +8,7 @@ use App\Http\Controllers\StoreProductController;
 use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\BlogCategoryController;
 use App\Http\Controllers\PublicBlogController;
+use App\Http\Controllers\QuoteController;
 
 // Public homepage
 Route::get('/', function () {
@@ -33,6 +34,23 @@ Route::middleware('auth')->group(function () {
     // AUTH CRUD - Products
     Route::get('/dashboard/products', [StoreProductController::class, 'myProducts'])->name('products.my');
     Route::resource('products', StoreProductController::class)->except(['index', 'show']);
+    
+    // Quote Management Routes
+    Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
+    Route::get('/quotes/create/{product}', [QuoteController::class, 'create'])->name('quotes.create');
+    Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store');
+    Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
+    Route::get('/quotes/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
+    Route::put('/quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
+    Route::delete('/quotes/{quote}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
+    
+    // Quote actions
+    Route::post('/quotes/{quote}/accept', [QuoteController::class, 'accept'])->name('quotes.accept');
+    Route::post('/quotes/{quote}/reject', [QuoteController::class, 'reject'])->name('quotes.reject');
+    Route::post('/quotes/{quote}/fulfill', [QuoteController::class, 'fulfill'])->name('quotes.fulfill');
+    
+    // AJAX route for quick quote creation
+    Route::post('/quotes/quick-store', [QuoteController::class, 'quickStore'])->name('quotes.quick-store');
 });
 
 // PUBLIC viewable - Products

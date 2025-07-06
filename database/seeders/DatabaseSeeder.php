@@ -35,5 +35,14 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Belt Tools', 'slug' => 'tools-literature'],
         ]);
 
+        Quote::factory()->create([
+            'product_id' => 1,
+            'buyer_id' => 2,
+            'seller_id' => 3,
+            'item' => '10 boxes of safety gloves',
+            'quote_date' => now(),
+            'status' => 'pending',
+        ]);
+
     }
 }
