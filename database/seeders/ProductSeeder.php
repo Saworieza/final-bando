@@ -10,9 +10,16 @@ use Spatie\Permission\Models\Role;
 
 class ProductSeeder extends Seeder
 {
+    protected $sampleImages = [
+        'sample-1.png',
+        'sample-2.png',
+        'sample-3.png',
+        'sample-4.png',
+        'sample-5.png'
+    ];
+
     public function run()
     {
-
         // Ensure Seller role exists
         Role::firstOrCreate(['name' => 'Seller']);
 
@@ -29,42 +36,47 @@ class ProductSeeder extends Seeder
                 });
         }
 
-        // Sample products data
+        // Sample products data - now using your sample images
         $products = [
             [
                 'name' => 'Industrial Conveyor Belt',
                 'description' => 'Heavy-duty conveyor belt for manufacturing',
                 'price' => 1250.99,
-                'image' => 'products/conveyor-belt.jpg',
-                'user_id' => $sellers->random()->id
+                'image' => 'images/'.$this->sampleImages[array_rand($this->sampleImages)],
+                'user_id' => $sellers->random()->id,
+                'category_id' => 1 // Industrial
             ],
             [
                 'name' => 'Hydraulic Pump',
                 'description' => 'High-pressure hydraulic pump system',
                 'price' => 899.50,
-                'image' => 'products/hydraulic-pump.jpg',
-                'user_id' => $sellers->random()->id
+                'image' => 'images/'.$this->sampleImages[array_rand($this->sampleImages)],
+                'user_id' => $sellers->random()->id,
+                'category_id' => 2 // Automotive
             ],
             [
                 'name' => 'Safety Gloves (Pack of 10)',
                 'description' => 'Industrial-grade safety gloves',
                 'price' => 45.00,
-                'image' => 'products/safety-gloves.jpg',
-                'user_id' => $sellers->random()->id
+                'image' => 'images/'.$this->sampleImages[array_rand($this->sampleImages)],
+                'user_id' => $sellers->random()->id,
+                'category_id' => 3 // Agricultural
             ],
             [
                 'name' => 'Steel Bearings',
                 'description' => 'Premium quality steel ball bearings',
                 'price' => 29.99,
                 'image' => null, // Testing nullable image
-                'user_id' => $sellers->random()->id
+                'user_id' => $sellers->random()->id,
+                'category_id' => 4 // Conveyor
             ],
             [
                 'name' => 'Electric Motor 5HP',
                 'description' => 'Industrial electric motor 5 horsepower',
                 'price' => 499.95,
-                'image' => 'products/electric-motor.jpg',
-                'user_id' => $sellers->random()->id
+                'image' => 'images/'.$this->sampleImages[array_rand($this->sampleImages)],
+                'user_id' => $sellers->random()->id,
+                'category_id' => 5 // Belt Tools
             ],
         ];
 

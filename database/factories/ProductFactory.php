@@ -25,7 +25,7 @@ class ProductFactory extends Factory
             'name' => $this->faker->unique()->words(3, true),
             'description' => $this->faker->boolean(80) ? $this->faker->paragraph : null,
             'price' => $this->faker->randomFloat(2, 10, 5000),
-            'image' => $this->faker->boolean(70) 
+            'image' => $this->faker->boolean(100) 
                 ? 'news/images/'.$this->faker->randomElement($this->sampleImages) 
                 : null,
             'category_id' => $this->faker->numberBetween(1, 5),
