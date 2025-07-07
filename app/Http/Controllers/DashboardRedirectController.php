@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
-// use App\Models\BlogPost;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Quote; // Add this import
 use Carbon\Carbon;
 
 class DashboardRedirectController extends Controller
@@ -24,7 +24,9 @@ class DashboardRedirectController extends Controller
             $dashboardData = $this->getSellerDashboardData();
             return view('seller.dashboard', $dashboardData);
         } elseif ($user->hasRole('Buyer')) {
-            return view('buyer.dashboard');
+            // Get dashboard data for buyer
+            $dashboardData = $this->getBuyerDashboardData();
+            return view('buyer.dashboard', $dashboardData);
         } elseif ($user->hasRole('Support Agent')) {
             return view('support.dashboard');
         } else {
@@ -58,11 +60,11 @@ class DashboardRedirectController extends Controller
         $recentProducts = Product::latest()
             ->take(5)
             ->get();
-        
-        // Get recent blog posts (latest 5)
-        // $recentPosts = BlogPost::latest()
-        //     ->take(5)
-        //     ->get();
+
+        // Get recent quotes (latest 5)
+        $recentQuotes = Quote::latest()
+            ->take(5)
+            ->get();
         
         return [
             // 'totalSales' => $totalSales,
@@ -70,7 +72,7 @@ class DashboardRedirectController extends Controller
             'newCustomers' => $newCustomers,
             'lowStockCount' => $lowStockCount,
             'recentProducts' => $recentProducts,
-            // 'recentPosts' => $recentPosts
+            'recentQuotes' => $recentQuotes,
         ];
     }
 
@@ -108,11 +110,82 @@ class DashboardRedirectController extends Controller
             ->take(5)
             ->get();
         
+        // Get recent quotes for this seller (latest 5)
+        $recentQuotes = Quote::where('user_id', $sellerId)
+            ->latest()
+            ->take(5)
+            ->get();
+        
         return [
             // 'totalSales' => $totalSales,
             // 'totalOrders' => $totalOrders,
             'lowStockCount' => $lowStockCount,
-            'recentProducts' => $recentProducts
+            'recentProducts' => $recentProducts,
+            'recentQuotes' => $recentQuotes
+        ];
+    }
+
+    private function getBuyerDashboardData()
+    {
+        $buyerId = Auth::id();
+        
+        // Get current month data for this buyer
+        $currentMonth = Carbon::now()->startOfMonth();
+        
+        // Uncomment and modify these as needed based on your Order model structure
+        // $totalSales = Order::where('buyer_id', $buyerId)
+        //     ->where('created_at', '>=', $currentMonth)
+        //     ->where('status', 'completed')
+        //     ->sum('total_amount');
+        
+        // $totalOrders = Order::where('buyer_id', $buyerId)->count();
+        
+        // Get low stock count for this buyer's products (if buyers can have products)
+        $lowStockCount = Product::where('user_id', $buyerId)
+            ->where(function($query) {
+                $query->where('stock', '<=', 5)
+                      ->orWhere('quantity', '<=', 5);
+            })->count();
+        
+        // Get recent products for this buyer (latest 5)
+        $recentProducts = Product::where('user_id', $buyerId)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // Get recent quotes for this buyer (latest 5)
+        $recentQuotes = Quote::where('user_id', $buyerId)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // Get quote statistics for summary cards
+        $totalQuotes = Quote::where('user_id', $buyerId)->count();
+        $pendingQuotes = Quote::where('user_id', $buyerId)->where('status', 'pending')->count();
+        $acceptedQuotes = Quote::where('user_id', $buyerId)->where('status', 'accepted')->count();
+        $rejectedQuotes = Quote::where('user_id', $buyerId)->where('status', 'rejected')->count();
+
+        // Get filtered quotes for the main table
+        $selectedTab = request('tab', 'all');
+        $quotesQuery = Quote::where('user_id', $buyerId)->with(['product', 'product.user', 'product.category']);
+        
+        if ($selectedTab !== 'all') {
+            $quotesQuery->where('status', $selectedTab);
+        }
+        
+        $quotes = $quotesQuery->latest()->get();
+        
+        return [
+            // 'totalSales' => $totalSales,
+            // 'totalOrders' => $totalOrders,
+            'lowStockCount' => $lowStockCount,
+            'recentProducts' => $recentProducts,
+            'recentQuotes' => $recentQuotes,
+            'totalQuotes' => $totalQuotes,
+            'pendingQuotes' => $pendingQuotes,
+            'acceptedQuotes' => $acceptedQuotes,
+            'rejectedQuotes' => $rejectedQuotes,
+            'quotes' => $quotes,
         ];
     }
 }
