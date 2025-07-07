@@ -30,19 +30,28 @@ class NewsController extends Controller
     /**
      * Display a listing of news articles
      */
-    public function index()
+   public function index(Request $request)
     {
-        try{
-            $news = News::with(['category', 'user'])
-                        // ->where('is_published', true)
-                        ->latest()
-                        ->paginate(10);
+        try {
+            $query = News::with(['category', 'user'])
+                        ->where('is_published', true)
+                        ->latest();
 
-            return view('news.index', compact('news'));
-        }catch (\Exception $e) {
-            dd($e->getMessage()); // This will show you the exact error
+            // Filter by category slug if provided
+            if ($request->has('category')) {
+                $category = Category::where('slug', $request->category)->firstOrFail();
+                $query->where('category_id', $category->id);
+            }
+
+            $news = $query->paginate(10);
+            $currentCategory = $request->has('category') ? Category::where('slug', $request->category)->first() : null;
+
+            return view('news.index', compact('news', 'currentCategory'));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error loading news: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Show the form for creating a new news article

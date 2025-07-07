@@ -29,6 +29,10 @@
 
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900">News Articles</h1>
+        <x-breadcrumb :links="[
+            'News' => route('news.index'),
+            $currentCategory?->name ?? 'All Articles' => null
+        ]" />
         @auth
             <a href="{{ route('news.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition duration-200">
                 <i class="fas fa-plus mr-2"></i> Create News

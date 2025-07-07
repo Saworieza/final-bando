@@ -1,7 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-800">All Products</h2>
+        <h2 class="text-xl font-semibold text-gray-800">Products</h2>
         <x-breadcrumb :links="[
+            'Products' => route('products.index'),
             $currentCategory?->name ?? 'All Products' => null
         ]" />
     </x-slot>

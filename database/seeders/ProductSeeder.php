@@ -50,7 +50,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Hydraulic Pump',
                 'description' => 'High-pressure hydraulic pump system',
                 'price' => 899.50,
-                'image' => 'images/'.$this->sampleImages[array_rand($this->sampleImages)],
+                'image' => 'news/images/'.$this->sampleImages[array_rand($this->sampleImages)],
                 'user_id' => $sellers->random()->id,
                 'category_id' => 2 // Automotive
             ],
@@ -58,7 +58,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Safety Gloves (Pack of 10)',
                 'description' => 'Industrial-grade safety gloves',
                 'price' => 45.00,
-                'image' => 'images/'.$this->sampleImages[array_rand($this->sampleImages)],
+                'image' => 'news/images/'.$this->sampleImages[array_rand($this->sampleImages)],
                 'user_id' => $sellers->random()->id,
                 'category_id' => 3 // Agricultural
             ],
@@ -66,7 +66,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Steel Bearings',
                 'description' => 'Premium quality steel ball bearings',
                 'price' => 29.99,
-                'image' => null, // Testing nullable image
+                'image' => 'news/images', // Testing nullable image
                 'user_id' => $sellers->random()->id,
                 'category_id' => 4 // Conveyor
             ],
@@ -74,7 +74,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Electric Motor 5HP',
                 'description' => 'Industrial electric motor 5 horsepower',
                 'price' => 499.95,
-                'image' => 'images/'.$this->sampleImages[array_rand($this->sampleImages)],
+                'image' => 'news/images/'.$this->sampleImages[array_rand($this->sampleImages)],
                 'user_id' => $sellers->random()->id,
                 'category_id' => 5 // Belt Tools
             ],

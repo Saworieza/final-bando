@@ -71,5 +71,9 @@ Route::get('/lang/{locale}', function ($locale) {
     return back();
 })->name('lang.switch');
 
+Route::get('/distributors', function () {
+    return view('distributors'); // You'll need to create this view
+})->name('distributors');
+
 // Breeze auth routes (login, register, etc.)
 require __DIR__.'/auth.php';

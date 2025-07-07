@@ -8,9 +8,12 @@
                 <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ $news->title }}</h1>
                 <div class="flex justify-between items-center text-sm">
                     <div class="flex items-center space-x-4">
-                        <span class="bg-blue-100 text-blue-800 font-semibold px-3 py-1 rounded-full">
-                            {{ $news->category->name }}
-                        </span>
+                        <span class=" text-blue-800 font-semibold px-3 py-1 rounded-full">
+                            <x-breadcrumb 
+                                :model="$news"
+                                :currentItem="$news->slug"
+                            />
+                        </span><br>
                         <span class="text-gray-600">Posted by {{ $news->user->name }}</span>
                     </div>
                     <div class="text-gray-500">{{ $news->created_at->format('F j, Y') }}</div>
