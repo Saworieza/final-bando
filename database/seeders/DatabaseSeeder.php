@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Category;
 use App\Models\BlogCategory;
+use App\Models\Quote; // Add this import at the top
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,17 +27,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminUserSeeder::class,
             NewsSeeder::class,
-        ]);
-
-        
-
-        Quote::factory()->create([
-            'product_id' => 1,
-            'buyer_id' => 2,
-            'seller_id' => 3,
-            'item' => '10 boxes of safety gloves',
-            'quote_date' => now(),
-            'status' => 'pending',
+            ProductSeeder::class,
+            QuoteSeeder::class,
         ]);
 
     }

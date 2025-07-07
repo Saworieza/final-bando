@@ -76,9 +76,9 @@ class NewsSeeder extends Seeder
         for ($i = 0; $i < $imageCount; $i++) {
             NewsMedia::create([
                 'news_id' => $news->id,
-                'file_path' => 'news/images/sample-' . rand(1, 5) . '.jpg',
+                'file_path' => 'news/images/sample-' . rand(1, 5) . '.png',
                 'file_type' => 'image',
-                'original_name' => 'sample-image-' . ($i + 1) . '.jpg',
+                'original_name' => 'sample-image-' . ($i + 1) . '.png',
                 'created_at' => $news->created_at,
             ]);
         }

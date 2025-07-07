@@ -43,7 +43,7 @@
                     </div>
                 </div>
 
-                {{-- Total Orders --}}
+                {{-- Total Quotes --}}
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-green-100 text-green-600">
@@ -52,13 +52,13 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Total Orders</p>
+                            <p class="text-sm font-medium text-gray-600">Total Quotes</p>
                             <p class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
 
-                {{-- New Customers --}}
+                {{-- Registered Buyers --}}
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-purple-100 text-purple-600">
@@ -67,7 +67,7 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">New Customers</p>
+                            <p class="text-sm font-medium text-gray-600">Registered Buyers</p>
                             <p class="text-2xl font-semibold text-gray-900">{{ $newCustomers ?? 0 }}</p>
                         </div>
                     </div>
@@ -125,8 +125,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
                         </svg>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-green-900">Manage News</p>
-                            <p class="text-xs text-green-700">Articles & Updates</p>
+                            <p class="text-sm font-medium text-green-900">Total Approved Quotes</p>
+                            <p class="text-xs text-green-700">Quotations</p>
                         </div>
                     </div>
                 </a>
@@ -337,6 +337,17 @@
             @php
                 $tabs = ['Buyer', 'Seller', 'Support Agent'];
                 $selectedTab = request('tab', 'Buyer');
+                
+                // Get user counts for each role
+                $buyerCount = \App\Models\User::role('Buyer')->count();
+                $sellerCount = \App\Models\User::role('Seller')->count();
+                $supportCount = \App\Models\User::role('Support Agent')->count();
+                
+                $userCounts = [
+                    'Buyer' => $buyerCount,
+                    'Seller' => $sellerCount,
+                    'Support Agent' => $supportCount
+                ];
             @endphp
 
             <div class="bg-white rounded-lg shadow">
@@ -348,7 +359,7 @@
                                 <a href="{{ route('dashboard', ['tab' => $tab]) }}"
                                     class="px-3 py-2 rounded-md text-sm font-medium
                                     {{ $selectedTab === $tab ? 'bg-blue-600 text-white' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100' }}">
-                                    {{ $tab }}s
+                                    <b>{{ $userCounts[$tab] }}</b> {{ $tab }}s
                                 </a>
                             @endforeach
                         </div>
