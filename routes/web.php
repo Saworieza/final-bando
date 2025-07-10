@@ -12,7 +12,23 @@ use App\Http\Controllers\QuoteResponseController;
 // Public homepage
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
+
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
+Route::get('/rnd', function () {
+    return view('rnd');
+})->name('rnd');
+
+Route::get('/network', function () {
+    return view('network');
+})->name('network');
+
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
 
 // Dashboard redirect (role-based)
 Route::get('/dashboard', [DashboardRedirectController::class, 'index'])

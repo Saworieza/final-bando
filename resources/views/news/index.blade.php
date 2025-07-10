@@ -27,60 +27,129 @@
         </div>
     @endif
 
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">News Articles</h1>
-        <x-breadcrumb :links="[
-            'News' => route('news.index'),
-            $currentCategory?->name ?? 'All Articles' => null
-        ]" />
-        @auth
-            <a href="{{ route('news.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition duration-200">
-                <i class="fas fa-plus mr-2"></i> Create News
-            </a>
-        @endauth
-    </div>
+    <!-- Header Section -->
+    <section class="text-center mb-12">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-4xl font-bold text-gray-900">Blog Posts & Updates</h1>
+            <x-breadcrumb :links="[
+                'News' => route('news.index'),
+                $currentCategory?->name ?? 'All Articles' => null
+            ]" />
+            @auth
+                <a href="{{ route('news.create') }}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center transition duration-200">
+                    <i class="fas fa-plus mr-2"></i> Add Blog Post
+                </a>
+            @endauth
+        </div>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+            Stay informed about the latest developments, product launches, and company updates from Bando Kenya.
+        </p>
+    </section>
 
     @if($news->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($news as $item)
-                <div class="bg-white rounded-lg shadow-sm hover-shadow overflow-hidden">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full">
-                                {{ $item->category->name }}
-                            </span>
-                            <small class="text-gray-500">{{ $item->created_at->format('M d, Y') }}</small>
+        <!-- Featured Post Section -->
+        @php
+            $featuredPost = $news->where('featured', true)->first();
+            $regularPosts = $news->where('featured', false);
+        @endphp
+
+        @if($featuredPost)
+            <section class="mb-16">
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2">
+                        <div class="lg:order-2">
+                            @if($featuredPost->image_url)
+                                <img src="{{ $featuredPost->image_url }}" alt="{{ $featuredPost->title }}" class="w-full h-64 lg:h-full object-cover">
+                            @else
+                                <div class="w-full h-64 lg:h-full bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-image text-4xl text-gray-400"></i>
+                                </div>
+                            @endif
                         </div>
-                        
-                        <h5 class="text-xl font-semibold mb-3">
-                            <a href="{{ route('news.show', $item->slug) }}" class="text-gray-900 hover:text-blue-600 transition duration-200">
-                                {{ $item->title }}
-                            </a>
-                        </h5>
-                        
-                        <p class="text-gray-600 mb-4">
-                            {{ Str::limit($item->content, 150) }}
-                        </p>
-                        
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <i class="fas fa-user text-gray-400 mr-2"></i>
-                                <small class="text-gray-500">{{ $item->user->name }}</small>
+                        <div class="p-8 lg:order-1 flex flex-col justify-center">
+                            <span class="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block w-fit">
+                                Featured
+                            </span>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                                {{ $featuredPost->title }}
+                            </h2>
+                            <p class="text-gray-600 mb-6">
+                                {{ $featuredPost->excerpt ?? Str::limit($featuredPost->content, 200) }}
+                            </p>
+                            <div class="flex items-center text-gray-500 text-sm mb-6">
+                                <i class="fas fa-user mr-2"></i>
+                                <span class="mr-4">{{ $featuredPost->user->name }}</span>
+                                <i class="fas fa-calendar mr-2"></i>
+                                <span>{{ $featuredPost->created_at->format('F j, Y') }}</span>
                             </div>
-                            
-                            <a href="{{ route('news.show', $item->slug) }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center transition duration-200">
-                                Read More <i class="fas fa-arrow-right ml-1"></i>
+                            <a href="{{ route('news.show', $featuredPost->slug) }}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg inline-flex items-center transition duration-200 w-fit">
+                                Read Full Post
+                                <i class="fas fa-arrow-right ml-2"></i>
                             </a>
                         </div>
                     </div>
                 </div>
-            @endforeach
-        </div>
-        
+            </section>
+        @endif
+
+        <!-- Posts Grid Section -->
+        <section>
+            <h2 class="text-2xl font-bold text-gray-900 mb-8">Recent Posts</h2>
+            @if($regularPosts->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach($regularPosts as $item)
+                        <article class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                            @if($item->image_url)
+                                <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="w-full h-48 object-cover">
+                            @else
+                                <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-image text-3xl text-gray-400"></i>
+                                </div>
+                            @endif
+                            
+                            <div class="p-6">
+                                <span class="text-red-600 text-sm font-medium">
+                                    {{ $item->category->name }}
+                                </span>
+                                <h3 class="text-xl font-bold text-gray-900 mt-2 mb-3 line-clamp-2">
+                                    <a href="{{ route('news.show', $item->slug) }}" class="hover:text-red-600 transition duration-200">
+                                        {{ $item->title }}
+                                    </a>
+                                </h3>
+                                <p class="text-gray-600 mb-4 line-clamp-3">
+                                    {{ $item->excerpt ?? Str::limit($item->content, 150) }}
+                                </p>
+                                <div class="flex items-center justify-between text-gray-500 text-sm mb-4">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-user mr-1"></i>
+                                        <span>{{ $item->user->name }}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        <span>{{ $item->created_at->format('M d, Y') }}</span>
+                                    </div>
+                                </div>
+                                <a href="{{ route('news.show', $item->slug) }}" class="w-full border border-gray-300 hover:border-red-600 text-gray-700 hover:text-red-600 px-4 py-2 rounded-lg inline-flex items-center justify-center transition duration-200">
+                                    Read More
+                                    <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-12">
+                    <p class="text-gray-500 text-lg">No regular blog posts available yet.</p>
+                </div>
+            @endif
+        </section>
+
+        <!-- Pagination -->
         <div class="flex justify-center mt-8">
             {{ $news->links() }}
         </div>
     @else
+        <!-- Empty State -->
         <div class="text-center py-12">
             <div class="mb-4">
                 <i class="fas fa-newspaper text-6xl text-gray-400"></i>
@@ -88,11 +157,40 @@
             <h3 class="text-2xl font-semibold text-gray-700 mb-2">No News Articles</h3>
             <p class="text-gray-500 mb-6">There are no news articles to display at the moment.</p>
             @auth
-                <a href="{{ route('news.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg inline-flex items-center transition duration-200">
+                <a href="{{ route('news.create') }}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg inline-flex items-center transition duration-200">
                     <i class="fas fa-plus mr-2"></i> Create First Article
                 </a>
             @endauth
         </div>
     @endif
+
+    <!-- Newsletter Signup Section -->
+   
 </div>
+
+@push('styles')
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .hover-shadow {
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .hover-shadow:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+</style>
+@endpush
 @endsection
