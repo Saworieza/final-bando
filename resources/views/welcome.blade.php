@@ -45,7 +45,7 @@
                     </div>
                 </a>
                 <a href="/products?category=conveyor-belts" class="group block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    <img src="https://i0.wp.com/chassol.co.tz/wp-content/uploads/2021/07/SAFET.jpg?fit=1000%2C786&ssl=1" alt="Safety Equipment" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <img src="https://www.sparksbelting.com/uploads/blog/conveyor-belt-materials.jpg" alt="Safety Equipment" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" />
                     <div class="p-6">
                         <h3 class="text-xl font-semibold text-gray-900 group-hover:text-red-600 transition-colors duration-300">Conveyor Belts</h3>
                     </div>
