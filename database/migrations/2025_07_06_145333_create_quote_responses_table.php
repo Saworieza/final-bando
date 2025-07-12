@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
             $table->decimal('price', 10, 2);
             $table->text('message');
+            $table->dateTime('estimated_delivery')->nullable(); 
             $table->timestamps();
         });
     }
