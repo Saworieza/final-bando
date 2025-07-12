@@ -8,3 +8,7 @@
    * Copyright 2011-2023 The Bootstrap Authors
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    */
+   .logo{
+      height: 3.1rem !important;
+      margin-top: 15px;
+   }

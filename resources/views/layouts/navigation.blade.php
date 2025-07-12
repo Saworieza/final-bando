@@ -52,7 +52,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <img src="{{ asset('storage/images/bando.png') }}" class="block h-9 w-auto" alt="Bando Kenya">
+                        <img src="{{ asset('storage/images/logo.png') }}" class="logo block h-9 w-auto" style="height: 3rem !important; margin-top: 1px;" alt="Bando Kenya">
                     </a>
                 </div>
 
