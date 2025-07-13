@@ -107,7 +107,8 @@ class StoreProductController extends Controller
 
         $product->update($data);
 
-        return redirect()->route('products.my')->with('status', 'Product updated!');
+        // return redirect()->route('products.my')->with('status', 'Product updated!');
+        return redirect()->route('products.show', $product)->with('status', 'Product updated!');
     }
 
     // Delete product
@@ -127,4 +128,4 @@ class StoreProductController extends Controller
         if (Auth::user()->hasRole('Admin')) return;
         if ($product->user_id !== Auth::id()) abort(403);
     }
-}
+} 
