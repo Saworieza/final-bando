@@ -4,21 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes
 use App\Models\Category;
 use App\Models\User;
 
 class Product extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'image',
-        'category_id',
-        'user_id',
+        'name','description','price','image','category_id','user_id',
+        'sku','stock_qty','min_order_qty','weight','dimensions','warranty','return_policy','status'
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'weight' => 'decimal:2',
+        ];
+    }
 
     public function category()
     {
