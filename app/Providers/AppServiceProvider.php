@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\Product; 
+use App\Observers\ProductObserver;
+
 Product::observe(ProductObserver::class);
 
 class AppServiceProvider extends ServiceProvider

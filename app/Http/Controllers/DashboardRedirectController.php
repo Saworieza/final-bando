@@ -128,64 +128,62 @@ class DashboardRedirectController extends Controller
     private function getBuyerDashboardData()
     {
         $buyerId = Auth::id();
-        
-        // Get current month data for this buyer
         $currentMonth = Carbon::now()->startOfMonth();
-        
-        // Uncomment and modify these as needed based on your Order model structure
-        // $totalSales = Order::where('buyer_id', $buyerId)
-        //     ->where('created_at', '>=', $currentMonth)
-        //     ->where('status', 'completed')
-        //     ->sum('total_amount');
-        
-        // $totalOrders = Order::where('buyer_id', $buyerId)->count();
-        
-        // Get low stock count for this buyer's products (if buyers can have products)
-        $lowStockCount = Product::where('user_id', $buyerId)
-            ->where(function($query) {
-                $query->where('stock', '<=', 5)
-                      ->orWhere('quantity', '<=', 5);
-            })->count();
-        
-        // Get recent products for this buyer (latest 5)
-        $recentProducts = Product::where('user_id', $buyerId)
+
+        // Core metrics
+        $totalQuotes        = Quote::where('buyer_id', $buyerId)->count();
+        $pendingQuotes      = Quote::where('buyer_id', $buyerId)->where('status', 'pending')->count();
+        $acceptedQuotes     = Quote::where('buyer_id', $buyerId)->where('status', 'accepted')->count();
+        $completedQuotes    = Quote::where('buyer_id', $buyerId)->where('status', 'completed')->count();
+        $rejectedQuotes     = Quote::where('buyer_id', $buyerId)->where('status', 'rejected')->count();
+
+        // Spending history (from completed quotes)
+        $totalSpent = Quote::where('buyer_id', $buyerId)
+            ->where('status', 'completed')
+            ->join('quote_responses', 'quotes.id', '=', 'quote_responses.quote_id')
+            ->sum(\DB::raw('quote_responses.price * quotes.quantity')); // simple revenue proxy
+
+        // Top suppliers (sellers this buyer has interacted with)
+        $topSuppliers = Quote::where('buyer_id', $buyerId)
+            ->with('product.user')
+            ->selectRaw('product_id, count(*) as quote_count')
+            ->groupBy('product_id')
+            ->orderByDesc('quote_count')
+            ->limit(5)
+            ->get()
+            ->map(fn ($q) => $q->product->user);
+
+        // Re-order suggestions – products with completed quotes older than 30 days
+        $reorderSuggestions = Quote::with('product')
+            ->where('buyer_id', $buyerId)
+            ->where('status', 'completed')
+            ->where('updated_at', '<', now()->subDays(30))
             ->latest()
-            ->take(5)
-            ->get();
+            ->limit(5)
+            ->get()
+            ->pluck('product');
 
-        // Get recent quotes for this buyer (latest 5)
-        $recentQuotes = Quote::where('user_id', $buyerId)
-            ->latest()
-            ->take(5)
-            ->get();
-
-        // Get quote statistics for summary cards
-        $totalQuotes = Quote::where('user_id', $buyerId)->count();
-        $pendingQuotes = Quote::where('user_id', $buyerId)->where('status', 'pending')->count();
-        $acceptedQuotes = Quote::where('user_id', $buyerId)->where('status', 'accepted')->count();
-        $rejectedQuotes = Quote::where('user_id', $buyerId)->where('status', 'rejected')->count();
-
-        // Get filtered quotes for the main table
+        // Recent quotes for the main table
         $selectedTab = request('tab', 'all');
-        $quotesQuery = Quote::where('user_id', $buyerId)->with(['product', 'product.user', 'product.category']);
-        
+        $quotesQuery = Quote::with(['product', 'product.user', 'product.category'])
+            ->where('buyer_id', $buyerId);
+
         if ($selectedTab !== 'all') {
             $quotesQuery->where('status', $selectedTab);
         }
-        
+
         $quotes = $quotesQuery->latest()->get();
-        
+
         return [
-            // 'totalSales' => $totalSales,
-            // 'totalOrders' => $totalOrders,
-            'lowStockCount' => $lowStockCount,
-            'recentProducts' => $recentProducts,
-            'recentQuotes' => $recentQuotes,
-            'totalQuotes' => $totalQuotes,
-            'pendingQuotes' => $pendingQuotes,
-            'acceptedQuotes' => $acceptedQuotes,
-            'rejectedQuotes' => $rejectedQuotes,
-            'quotes' => $quotes,
+            'totalQuotes'        => $totalQuotes,
+            'pendingQuotes'      => $pendingQuotes,
+            'acceptedQuotes'     => $acceptedQuotes,
+            'completedQuotes'    => $completedQuotes,
+            'rejectedQuotes'     => $rejectedQuotes,
+            'totalSpent'         => $totalSpent,
+            'topSuppliers'       => $topSuppliers,
+            'reorderSuggestions' => $reorderSuggestions,
+            'quotes'             => $quotes,
         ];
     }
 }
