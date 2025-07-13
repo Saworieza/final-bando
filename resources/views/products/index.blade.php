@@ -1,3 +1,4 @@
+@section('title', 'Products - Bando Kenya')
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -8,12 +9,16 @@
                     $currentCategory?->name ?? 'All Products' => null
                 ]" />
             </div>
-            <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                </svg>
-                Add Product
-            </button>
+            @auth
+                @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Seller'))
+                    <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Add Product
+                    </button>
+                @endif
+            @endauth
         </div>
     </x-slot>
 
@@ -162,7 +167,6 @@
             </div>
         </section>
 
-
         <!-- JavaScript for Client-side Filtering -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -174,23 +178,32 @@
                 const noResults = document.getElementById('noResults');
                 const productsGrid = document.getElementById('productsGrid');
                 
-                let currentCategory = '';
+                // Get current category from URL or PHP variable
+                let currentCategory = @json($currentCategory?->name ?? '');
                 let currentSearch = '';
                 
-                // Extract categories from products
-                const categories = new Set();
+                // Extract ALL categories from the database (all products, not just filtered ones)
+                const allCategories = new Set();
+                @foreach(\App\Models\Category::all() as $category)
+                    allCategories.add('{{ $category->name }}');
+                @endforeach
+                
+                // Also extract categories from displayed products as fallback
                 productCards.forEach(card => {
                     const category = card.dataset.category;
                     if (category && category !== 'Uncategorized') {
-                        categories.add(category);
+                        allCategories.add(category);
                     }
                 });
                 
-                // Populate category filter
-                categories.forEach(category => {
+                // Populate category filter with all categories
+                allCategories.forEach(category => {
                     const option = document.createElement('option');
                     option.value = category;
                     option.textContent = category;
+                    if (category === currentCategory) {
+                        option.selected = true;
+                    }
                     categoryFilter.appendChild(option);
                 });
                 
@@ -208,7 +221,7 @@
                     categoryChips.appendChild(allChip);
                     
                     // Category chips
-                    categories.forEach(category => {
+                    allCategories.forEach(category => {
                         const chip = document.createElement('button');
                         chip.textContent = category;
                         chip.className = `px-4 py-2 rounded-full text-sm font-medium transition-colors ${
@@ -265,6 +278,21 @@
                 function filterByCategory(category) {
                     currentCategory = category;
                     categoryFilter.value = category;
+                    
+                    // Update URL without page reload
+                    const url = new URL(window.location);
+                    if (category) {
+                        // Find category slug from name
+                        @foreach(\App\Models\Category::all() as $cat)
+                            if ('{{ $cat->name }}' === category) {
+                                url.searchParams.set('category', '{{ $cat->slug }}');
+                            }
+                        @endforeach
+                    } else {
+                        url.searchParams.delete('category');
+                    }
+                    window.history.pushState({}, '', url);
+                    
                     createCategoryChips();
                     filterProducts();
                 }
@@ -275,6 +303,12 @@
                     currentSearch = '';
                     searchInput.value = '';
                     categoryFilter.value = '';
+                    
+                    // Update URL
+                    const url = new URL(window.location);
+                    url.searchParams.delete('category');
+                    window.history.pushState({}, '', url);
+                    
                     createCategoryChips();
                     filterProducts();
                 };

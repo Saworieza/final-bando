@@ -12,25 +12,18 @@ use App\Models\ProductImage;
 class StoreProductController extends Controller
 {
     // Public product list
-    
     public function index(Request $request)
     {
-        $query = Product::with('category', 'user')->latest();
-
-        // Filter by category slug if passed
+        // Always get all products for proper filtering
+        $products = Product::with('category', 'user')->latest()->get();
+        
+        // Get current category if filtering by category
+        $currentCategory = null;
         if ($request->has('category')) {
-            $category = Category::where('slug', $request->category)->firstOrFail();
-            $query->where('category_id', $category->id);
+            $currentCategory = Category::where('slug', $request->category)->first();
         }
 
-        $products = $query->get();
-
-        $currentCategory = $request->has('category') ? Category::where('slug', $request->category)->first() : null;
-
-        // return view('products.index', compact('products'));
         return view('products.index', compact('products', 'currentCategory'));
-
-        
     }
 
     // Public product details
