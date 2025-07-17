@@ -5,7 +5,8 @@
 @push('styles')
 <style>
     .hero-gradient {
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        /* background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important; */
+        background: linear-gradient(135deg, #2d1b69 0%, #e91e63 100%) !important;
     }
     
     .card-gradient-red {
@@ -47,13 +48,15 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- Hero Section -->
-    <div class="relative overflow-hidden hero-gradient rounded-xl mb-12 p-12 text-center">
+    <div class="relative overflow-hidden hero-gradient rounded-xl mb-12 p-12 text-center" style="background: linear-gradient(135deg, #2d1b69 0%, #e91e63 100%)">
         <div class="relative z-10">
             <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-                Let's Start a Conversation
+                Get in Touch <br> Let’s Power Progress Together
             </h1>
             <p class="text-lg text-red-100 max-w-2xl mx-auto leading-relaxed">
-                Connect with our pharmaceutical experts. We're here to support your healthcare needs with innovative solutions and personalized service.
+                At Bando Kenya, we specialize in connecting businesses with high-quality automotive, agricultural, and industrial products through a reliable, B2B e-commerce experience. Whether you're sourcing parts in bulk, managing supply chains, or looking to partner with a trusted distributor, we’re here to support your business every step of the way.
+
+Our team is dedicated to making procurement faster, more efficient, and tailored to your unique needs. Reach out today—we're ready to help you drive growth and deliver value where it matters most.
             </p>
         </div>
     </div>

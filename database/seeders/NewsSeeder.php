@@ -13,6 +13,7 @@ class NewsSeeder extends Seeder
 {
     public function run()
     {
+
         // SQLite-compatible data cleanup
         if (DB::connection()->getDriverName() === 'sqlite') {
             DB::statement('PRAGMA foreign_keys = OFF;');
